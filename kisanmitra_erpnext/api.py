@@ -162,31 +162,111 @@ def issue():
   	return True
 
 
+@frappe.whitelist()
+def comment():
+	comment_list=[]
+	count = 1
+	with open('/home/deepak/Desktop/KMComments.csv') as kmdata:
+   		reader = csv.DictReader(kmdata)
+   		for row in reader:
+   			dict={"case_number":row.get("Cases Case Number") ,
+   				  "content":row.get("Comments Comment"),
+   				  "reference_owner":row.get("Comments Creator"),
+   				  "subject":row.get("Comments Related To"),
+   				  "creation":row.get("Comments Created Time"),
+   				  "modified":row.get("Comments Modified Time")}
+			comment_list.append(dict)
+
+		for i in comment_list:
+			reference_name=''
+			reference_doctype = ''
+			status = 'Open'
+			if i.get("case_number"):
+				name_prifix = 'VKB-' if str(i.get("case_number"))[0]=='V' or str(i.get("case_number"))[0]=='v' else 'KM-'
+				name_suffix = str(map(int,re.findall('\d+', str(i.get("case_number"))))[0])
+				while len(name_suffix) < 5:
+					name_suffix = '0' + name_suffix
+				reference_name =str(str(name_prifix) + name_suffix)
+				reference_doctype = "Issue"
+				status = "linked"
+			name = frappe.generate_hash(length=10)
+			creation = frappe.utils.get_datetime_str(datetime.strptime(i.get("creation"), "%d-%m-%Y %I:%M %p"))
+			modified = frappe.utils.get_datetime_str(datetime.strptime(i.get("modified"), "%d-%m-%Y %I:%M %p"))
+			modified_by_name = i.get("reference_owner")
+			if modified_by_name == "Visheshwar Rao":
+				modified_by_name = "Vishesh rao Urvetha"
+			print(modified_by_name)
+			modified_by = (frappe.get_all("User" , filters = {"full_name":modified_by_name})[0]).get("name")
+			sender_full_name = modified_by_name
+
+
+
+			frappe.db.sql("""insert into `tabCommunication`
+			(comment_type, communication_type, content, reference_owner, subject, 
+			reference_doctype, reference_name, communication_date, user, 
+			creation, modified, modified_by, name , status, 
+			sender_full_name ,sent_or_received) values
+			('Comment','Comment',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+			(i.get("content"),modified_by, i.get("subject"), reference_doctype, reference_name, creation,
+			modified_by, creation, modified, modified_by, name ,status, sender_full_name, 'Send'))
+
+			print("Comment {0}".format(count))
+			count += 1
+	frappe.db.commit()		
+	return True  	
+
+
 
 @frappe.whitelist()
 def demo_issue():
-	demo_list=[]
+	demo_issue_list=[]
 	# count = 1
 	with open('/home/deepak/Desktop/KMissue.csv') as kmdata:
    		reader = csv.DictReader(kmdata)
    		for row in reader:
    			# if row.get("Resolution Type") == '':
    			# 	print(count)
-			demo_list.append(row.get("Status"))
+			demo_issue_list.append(row.get("Case Number"))
 			# count += 1
-	return demo_list
+	return demo_issue_list
 
 
 @frappe.whitelist()
 def demo_lead():
-	demo_list=[]
+	demo_lead_list=[]
 	# count = 1
 	with open('/home/deepak/Desktop/kisanmitra (copy).csv') as kmdata:
    		reader = csv.DictReader(kmdata)
    		for row in reader:
    			if row.get("Contacts Last Name") == '0':	
-				demo_list.append(row.get("Contacts First Name"))
+				demo_lead_list.append(row.get("Contacts First Name"))
 			# count += 1
-	return demo_list			
+	return demo_lead_list
+
+
+@frappe.whitelist()
+def demo_comments():
+	demo_comment_list=[]
+	# count = 1
+	with open('/home/deepak/Desktop/KMComments.csv') as kmdata:
+   		reader = csv.DictReader(kmdata)
+   		for row in reader:
+			demo_comment_list.append(row.get("Comments Creator"))
+			# count += 1
+	return demo_comment_list
+
+
+@frappe.whitelist()
+def demo_phone_call():
+	demo_phone_call_list=[]
+	# count = 1
+	with open('/home/deepak/Desktop/KMPhone_call.csv') as kmdata:
+   		reader = csv.DictReader(kmdata)
+   		for row in reader:
+   			if row.get("Cases Case Number") == "VKB59":
+   				dict={"case":row.get("Cases Case Number"),"creation":row.get("Phone Calls Created Time"),"modify":row.get("Phone Calls Modified Time"),"status":row.get("Phone Calls Call Status"),"call direction":row.get("Phone Calls Direction")}
+				demo_phone_call_list.append(dict)
+			# count += 1
+	return demo_phone_call_list					
 
 					
