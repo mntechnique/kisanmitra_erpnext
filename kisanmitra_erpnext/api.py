@@ -6,42 +6,6 @@ from datetime import datetime
 from frappe.model.naming import make_autoname
 
 @frappe.whitelist()
-def imported_data():
-	finallist = []
-	z = []
-	with open('/home/deepak/Desktop/kisanmitra (copy).csv') as kmdata:
-   		reader = csv.DictReader(kmdata)
-   		for row in reader:
-			z = import_leads(row)
-  			finallist.append(z)
-  	return finallist
-
-def import_leads(eachrow):
-	a = {
-	"Mobile" : eachrow.get("Contacts Mobile Phone") ,
-	"Lead Source" : eachrow.get("Contacts Contact Type"),
-	"Territory" : eachrow.get("Contacts Mandal"),
-	"modified _by" : eachrow.get("Contacts Last Modified By"),
-	"creation" : eachrow.get("Contacts Created Time"),
-	"modified" : eachrow.get("Contacts Modified Time"),
-	"_assign" : eachrow.get("Contacts Assigned To"),
-	"name" : eachrow.get("Cases Case Number")
-	}
-	return a
-
-
-@frappe.whitelist()
-def lead_source():
-	unique_lead_source=[]
-	with open('/home/deepak/Desktop/kisanmitra (copy).csv') as kmdata:
-   		reader = csv.DictReader(kmdata)
-   		for row in reader:
-   			if(row.get("Contacts Contact Type")):
-				unique_lead_source.append(row.get("Contacts Contact Type"))
-  	return unique_lead_source	
-
-
-@frappe.whitelist()
 def lead():
 	lead_list=[]
 	contact_list=[]
@@ -59,7 +23,6 @@ def lead():
 			contact_list.append(dict)
 
 	unique_lead = list(set(lead_list))
-	count = 1
 	for i in unique_lead:
 		
 		contact_details = [j for j in contact_list if i == (j.get("first_name")+" "+j.get("last_name"))][0]
@@ -86,11 +49,7 @@ def lead():
 			"link_name":name
 			})
 		new_contact.save()
-
-		print ("Lead {0}".format(count))
-		count += 1
-	frappe.db.commit()
-	return True 
+	frappe.db.commit() 
 
 @frappe.whitelist()
 def issue():
@@ -122,7 +81,6 @@ def issue():
 				  "km_relation":row.get("Relation"),
 				  "km_relation_name":row.get("Relation Name") }
 			issue_list.append(dict)	
-	count = 1
 	for i in issue_list:
 		
 		name_prifix = 'VKB-' if str(i.get("name"))[0]=='V' or str(i.get("name"))[0]=='v' else 'KM-'
@@ -155,17 +113,12 @@ def issue():
 		i.get("km_mandal_case"), i.get("km_village_case"), i.get("km_caste_category"), i.get("km_caste"),
 		i.get("contact"), i.get("km_other_caste"), i.get("km_case_category"),
 		i.get("km_district_case"), i.get("km_relation"), i.get("km_relation_name"), modified_by, lead))
-
-		print("Issue {0}".format(count))
-		count += 1
 	frappe.db.commit()		
-  	return True
 
 
 @frappe.whitelist()
 def comment():
 	comment_list=[]
-	count = 1
 	with open('/home/deepak/Desktop/KMComments.csv') as kmdata:
    		reader = csv.DictReader(kmdata)
    		for row in reader:
@@ -177,7 +130,63 @@ def comment():
    				  "modified":row.get("Comments Modified Time")}
 			comment_list.append(dict)
 
-		for i in comment_list:
+	for i in comment_list:
+		reference_name=''
+		reference_doctype = ''
+		status = 'Open'
+		if i.get("case_number"):
+			name_prifix = 'VKB-' if str(i.get("case_number"))[0]=='V' or str(i.get("case_number"))[0]=='v' else 'KM-'
+			name_suffix = str(map(int,re.findall('\d+', str(i.get("case_number"))))[0])
+			while len(name_suffix) < 5:
+				name_suffix = '0' + name_suffix
+			reference_name =str(str(name_prifix) + name_suffix)
+			reference_doctype = "Issue"
+			status = "Linked"
+		name = frappe.generate_hash(length=10)
+		creation = frappe.utils.get_datetime_str(datetime.strptime(i.get("creation"), "%d-%m-%Y %I:%M %p"))
+		modified = frappe.utils.get_datetime_str(datetime.strptime(i.get("modified"), "%d-%m-%Y %I:%M %p"))
+		modified_by_name = i.get("reference_owner")
+		if modified_by_name == "Visheshwar Rao":
+			modified_by_name = "Vishesh rao Urvetha"
+		modified_by = (frappe.get_all("User" , filters = {"full_name":modified_by_name})[0]).get("name")
+		sender_full_name = modified_by_name
+
+		frappe.db.sql("""insert into `tabCommunication`
+		(comment_type, communication_type, content, reference_owner, subject, 
+		reference_doctype, reference_name, communication_date, user, 
+		creation, modified, modified_by, name , status, 
+		sender_full_name ,sent_or_received) values
+		('Comment','Comment',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+		(i.get("content"),modified_by, i.get("subject"), reference_doctype, reference_name, creation,
+		modified_by, creation, modified, modified_by, name ,status, sender_full_name, 'Send'))
+	frappe.db.commit()		
+
+
+
+@frappe.whitelist()
+def phone_call():
+	phone_call_list=[]
+	with open('/home/deepak/Desktop/KMPhone_call.csv') as kmdata:
+   		reader = csv.DictReader(kmdata)
+   		for row in reader:
+   			dict={"case_number":row.get("Cases Case Number") ,
+   				  "reference_owner":row.get("Phone Calls Created By"),
+   				  "subject":row.get("Phone Calls Cases"),
+   				  "creation":row.get("Phone Calls Created Time"),
+   				  "modified":row.get("Phone Calls Modified Time"),
+   				  "modified_by":row.get("Phone Calls Last Modified By"),
+   				  "sent_or_received":row.get("Phone Calls Direction"),
+   				  "km_call_status":row.get("Phone Calls Call Status"),
+   				  "km_call_customer":row.get("Phone Calls Customer"),
+   				  "phone_no":row.get("Phone Calls Customer Number"),
+   				  "km_calls_start_time":row.get("Phone Calls Start Time"),
+   				  "km_calls_end_time":row.get("Phone Calls End Time"),
+   				  "km_call_duration":row.get("Phone Calls Duration (sec)"),
+   				  "km_call_gateway":row.get("Phone Calls Gateway")}
+			phone_call_list.append(dict)
+
+	for i in phone_call_list:
+		if i.get("modified_by"):
 			reference_name=''
 			reference_doctype = ''
 			status = 'Open'
@@ -188,85 +197,30 @@ def comment():
 					name_suffix = '0' + name_suffix
 				reference_name =str(str(name_prifix) + name_suffix)
 				reference_doctype = "Issue"
-				status = "linked"
+				status = "Linked"
 			name = frappe.generate_hash(length=10)
 			creation = frappe.utils.get_datetime_str(datetime.strptime(i.get("creation"), "%d-%m-%Y %I:%M %p"))
 			modified = frappe.utils.get_datetime_str(datetime.strptime(i.get("modified"), "%d-%m-%Y %I:%M %p"))
+			km_calls_start_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_start_time"), "%d-%m-%Y %I:%M %p"))
+			km_calls_end_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_end_time"), "%d-%m-%Y %I:%M %p"))
 			modified_by_name = i.get("reference_owner")
 			if modified_by_name == "Visheshwar Rao":
 				modified_by_name = "Vishesh rao Urvetha"
-			print(modified_by_name)
 			modified_by = (frappe.get_all("User" , filters = {"full_name":modified_by_name})[0]).get("name")
 			sender_full_name = modified_by_name
-
-
+			if i.get("sent_or_received") == "inbound":
+				sent_or_received = "Received"
+			else :
+				sent_or_received = "Send"	
 
 			frappe.db.sql("""insert into `tabCommunication`
-			(comment_type, communication_type, content, reference_owner, subject, 
-			reference_doctype, reference_name, communication_date, user, 
-			creation, modified, modified_by, name , status, 
-			sender_full_name ,sent_or_received) values
-			('Comment','Comment',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-			(i.get("content"),modified_by, i.get("subject"), reference_doctype, reference_name, creation,
-			modified_by, creation, modified, modified_by, name ,status, sender_full_name, 'Send'))
-
-			print("Comment {0}".format(count))
-			count += 1
-	frappe.db.commit()		
-	return True  	
-
-
-
-@frappe.whitelist()
-def demo_issue():
-	demo_issue_list=[]
-	# count = 1
-	with open('/home/deepak/Desktop/KMissue.csv') as kmdata:
-   		reader = csv.DictReader(kmdata)
-   		for row in reader:
-   			# if row.get("Resolution Type") == '':
-   			# 	print(count)
-			demo_issue_list.append(row.get("Case Number"))
-			# count += 1
-	return demo_issue_list
-
-
-@frappe.whitelist()
-def demo_lead():
-	demo_lead_list=[]
-	# count = 1
-	with open('/home/deepak/Desktop/kisanmitra (copy).csv') as kmdata:
-   		reader = csv.DictReader(kmdata)
-   		for row in reader:
-   			if row.get("Contacts Last Name") == '0':	
-				demo_lead_list.append(row.get("Contacts First Name"))
-			# count += 1
-	return demo_lead_list
-
-
-@frappe.whitelist()
-def demo_comments():
-	demo_comment_list=[]
-	# count = 1
-	with open('/home/deepak/Desktop/KMComments.csv') as kmdata:
-   		reader = csv.DictReader(kmdata)
-   		for row in reader:
-			demo_comment_list.append(row.get("Comments Creator"))
-			# count += 1
-	return demo_comment_list
-
-
-@frappe.whitelist()
-def demo_phone_call():
-	demo_phone_call_list=[]
-	# count = 1
-	with open('/home/deepak/Desktop/KMPhone_call.csv') as kmdata:
-   		reader = csv.DictReader(kmdata)
-   		for row in reader:
-   			if row.get("Cases Case Number") == "VKB59":
-   				dict={"case":row.get("Cases Case Number"),"creation":row.get("Phone Calls Created Time"),"modify":row.get("Phone Calls Modified Time"),"status":row.get("Phone Calls Call Status"),"call direction":row.get("Phone Calls Direction")}
-				demo_phone_call_list.append(dict)
-			# count += 1
-	return demo_phone_call_list					
-
-					
+			(comment_type, communication_type, reference_owner, subject, reference_doctype, reference_name, 
+			communication_date, user, creation, modified, modified_by, name , status, sender_full_name , sent_or_received , 
+			km_call_status , km_call_customer , phone_no , km_calls_start_time , km_calls_end_time , km_call_duration , 
+			km_call_gateway ) values 
+			('Info', 'Communication', %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+			(modified_by ,i.get("subject") ,reference_doctype ,reference_name ,creation ,modified_by, creation, modified, 
+			modified_by, name ,status ,sender_full_name ,sent_or_received ,i.get("km_call_status") ,i.get("km_call_customer") ,
+			i.get("phone_no") ,km_calls_start_time ,km_calls_end_time ,i.get("km_call_duration") ,
+			'Exotel'))
+	frappe.db.commit()			  	

@@ -136,5 +136,13 @@ fixtures = [
 									"Issue-km_other_caste",
 									"Issue-km_case_category",
 									"Issue-km_district_case",
-									"Issue-km_relation"]]]
+									"Issue-km_relation",
+									"Communication-section_break_48",
+									"Communication-km_call_status",
+									"Communication-km_call_customer",
+									"Communication-column_break_52",
+									"Communication-km_call_duration",
+									"Communication-km_call_gateway",
+									"Communication-km_calls_start_time",
+									"Communication-km_calls_end_time"]]]
 	}]
