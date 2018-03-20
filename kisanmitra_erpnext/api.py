@@ -189,6 +189,8 @@ def phone_call():
 		if i.get("modified_by"):
 			reference_name=''
 			reference_doctype = ''
+			km_calls_start_time = ''
+			km_calls_end_time = ''
 			status = 'Open'
 			if i.get("case_number"):
 				name_prifix = 'VKB-' if str(i.get("case_number"))[0]=='V' or str(i.get("case_number"))[0]=='v' else 'KM-'
@@ -201,8 +203,10 @@ def phone_call():
 			name = frappe.generate_hash(length=10)
 			creation = frappe.utils.get_datetime_str(datetime.strptime(i.get("creation"), "%d-%m-%Y %I:%M %p"))
 			modified = frappe.utils.get_datetime_str(datetime.strptime(i.get("modified"), "%d-%m-%Y %I:%M %p"))
-			km_calls_start_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_start_time"), "%d-%m-%Y %I:%M %p"))
-			km_calls_end_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_end_time"), "%d-%m-%Y %I:%M %p"))
+			if i.get("km_calls_start_time"):
+				km_calls_start_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_start_time"), "%d-%m-%Y %I:%M %p"))
+			if i.get("km_calls_end_time"):
+				km_calls_end_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_end_time"), "%d-%m-%Y %I:%M %p"))
 			modified_by_name = i.get("reference_owner")
 			if modified_by_name == "Visheshwar Rao":
 				modified_by_name = "Vishesh rao Urvetha"
