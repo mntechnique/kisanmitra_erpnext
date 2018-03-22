@@ -73,7 +73,7 @@ def issue():
 				  "km_village_case":row.get("Village Case"),
 				  "km_caste_category":row.get("Caste Category"),
 				  "km_caste":row.get("Caste"),
-				  "contact":row.get("Alternate Contact Number"),
+				  # "contact":row.get("Alternate Contact Number"),
 				  "km_other_caste":row.get("Other Caste"),
 				  "km_case_category":row.get("Case Category"),
 				  "farmer_name":row.get("Farmer Name"),
@@ -96,11 +96,42 @@ def issue():
 		modified_by = (frappe.get_all("User" , filters = {"full_name":modified_by_name})[0]).get("name")
 		km_are_you_calling_for_yourself = 1 if str(i.get("km_are_you_calling_for_yourself")) == 'yes' else 0
 		lead = ''
+		contact = ''
 		if len((frappe.get_all("Lead", filters={"company_name":i.get("km_caller_name")}))):
 			lead = (frappe.get_all("Lead", filters={"company_name":i.get("km_caller_name")}))[0].get("name")
 		elif len((frappe.get_all("Lead", filters={"company_name":i.get("farmer_name")}))):
-			lead = (frappe.get_all("Lead", filters={"company_name":i.get("farmer_name")}))[0].get("name")	
+			lead = (frappe.get_all("Lead", filters={"company_name":i.get("farmer_name")}))[0].get("name")
+		if lead:
+			contact = frappe.db.get_value("Dynamic Link",{"link_name":lead},"parent")		
 		
+		if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":"All Territories" ,"territory_name":i.get("km_state")}) and i.get("km_state"):
+			new_state_territory = frappe.new_doc("Territory")
+			new_state_territory.is_group= 1
+			new_state_territory.parent_territory = "All Territories"
+			new_state_territory.territory_name = i.get("km_state")
+			new_state_territory.save()
+
+			if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":i.get("km_state") ,"territory_name":i.get("km_district_case")}) and i.get("km_district_case"):
+				new_district_territory = frappe.new_doc("Territory")
+				new_district_territory.is_group= 1
+				new_district_territory.parent_territory = i.get("km_state")
+				new_district_territory.territory_name = i.get("km_district_case")
+				new_district_territory.save()
+
+				if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":i.get("km_district_case") ,"territory_name":i.get("km_mandal_case")}) and i.get("km_mandal_case"):
+					new_mandel_territory = frappe.new_doc("Territory")
+					new_mandel_territory.is_group= 1
+					new_mandel_territory.parent_territory = i.get("km_district_case")
+					new_mandel_territory.territory_name = i.get("km_mandal_case")
+					new_mandel_territory.save()
+
+					if not frappe.get_all("Territory",filters = {"parent_territory":i.get("km_mandal_case") ,"territory_name":i.get("km_village_case")}) and i.get("km_village_case"):
+						new_village_territory = frappe.new_doc("Territory")
+						new_village_territory.is_group= 1
+						new_village_territory.parent_territory = i.get("km_mandal_case")
+						new_village_territory.territory_name = i.get("km_village_case")
+						new_village_territory.save()			
+
 		frappe.db.sql("""insert into `tabIssue`
 		(subject, description, creation, name, modified, owner, resolution_details, modified_by,
 		km_resolution_type, km_caller_name, km_are_you_calling_for_yourself, km_caller_relationship_with_farmer,
@@ -111,7 +142,7 @@ def issue():
 		modified_by, i.get("resolution_details"), modified_by, i.get("km_resolution_type"),
 		i.get("km_caller_name"), str(km_are_you_calling_for_yourself), i.get("km_caller_relationship_with_farmer"),
 		i.get("km_mandal_case"), i.get("km_village_case"), i.get("km_caste_category"), i.get("km_caste"),
-		i.get("contact"), i.get("km_other_caste"), i.get("km_case_category"),
+		contact, i.get("km_other_caste"), i.get("km_case_category"),
 		i.get("km_district_case"), i.get("km_relation"), i.get("km_relation_name"), modified_by, lead))
 	frappe.db.commit()		
 
@@ -227,4 +258,24 @@ def phone_call():
 			modified_by, name ,status ,sender_full_name ,sent_or_received ,i.get("km_call_status") ,i.get("km_call_customer") ,
 			i.get("phone_no") ,km_calls_start_time ,km_calls_end_time ,i.get("km_call_duration") ,
 			'Exotel' ,modified_by))
+
+			if row.get("Phone Calls Customer Number"):
+				if not len((frappe.get_all("Contact", filters={"mobile_no":row.get("Phone Calls Customer Number")}))):
+					if m.km_caller_name == i.get("km_call_customer"):
+						first_name = i.get("km_call_customer")
+					elif i.get("km_call_customer"):
+						first_name = i.get("km_call_customer")
+					elif m.km_caller_name:
+						first_name = m.km_caller_name
+					if first_name:
+						new_contact = frappe.new_doc("Contact")
+						new_contact.first_name = first_name
+						new_contact.last_name = row.get("Phone Calls Customer Number")
+						new_contact.mobile_no = row.get("Phone Calls Customer Number")
+						new_contact.save()
+						m = frappe.get_doc("Issue",reference_name)
+						if m.contact == '':
+							m.contact = new_contact.name
+							m.save()
+
 	frappe.db.commit()			  	
