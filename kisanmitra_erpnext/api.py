@@ -73,13 +73,18 @@ def issue():
 				  "km_village_case":row.get("Village Case"),
 				  "km_caste_category":row.get("Caste Category"),
 				  "km_caste":row.get("Caste"),
-				  # "contact":row.get("Alternate Contact Number"),
+				  "recording_url":row.get("Phone Calls Recording"),
+				  "sid":row.get("Phone Calls Source UUID"),
 				  "km_other_caste":row.get("Other Caste"),
 				  "km_case_category":row.get("Case Category"),
 				  "farmer_name":row.get("Farmer Name"),
+				  "km_state_case":"Telangana",
+				  # "km_state_case":row.get("State Case"),
 				  "km_district_case":row.get("District case"),
 				  "km_relation":row.get("Relation"),
-				  "km_relation_name":row.get("Relation Name") }
+				  "km_relation_name":row.get("Relation Name"),
+				  "km_call_type":row.get("Call Type") ,
+				  "km_priority":row.get("Priority")}
 			issue_list.append(dict)	
 	for i in issue_list:
 		
@@ -102,48 +107,71 @@ def issue():
 		elif len((frappe.get_all("Lead", filters={"company_name":i.get("farmer_name")}))):
 			lead = (frappe.get_all("Lead", filters={"company_name":i.get("farmer_name")}))[0].get("name")
 		if lead:
-			contact = frappe.db.get_value("Dynamic Link",{"link_name":lead},"parent")		
+			contact = frappe.db.get_value("Dynamic Link",{"link_name":lead},"parent")
+		state = str(i.get("km_state_case"))
+		district = str(i.get("km_district_case"))
+ 		mandal = str(i.get("km_mandal_case"))
+ 		village = str(i.get("km_mandal_case"))
+					
 		
-		if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":"All Territories" ,"territory_name":i.get("km_state")}) and i.get("km_state"):
+		if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":"All Territories" ,"territory_name":state}) and \
+		state:
 			new_state_territory = frappe.new_doc("Territory")
-			new_state_territory.is_group= 1
+			new_state_territory.is_group = 1
 			new_state_territory.parent_territory = "All Territories"
-			new_state_territory.territory_name = i.get("km_state")
+			new_state_territory.territory_name = state
 			new_state_territory.save()
 
-			if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":i.get("km_state") ,"territory_name":i.get("km_district_case")}) and i.get("km_district_case"):
-				new_district_territory = frappe.new_doc("Territory")
-				new_district_territory.is_group= 1
-				new_district_territory.parent_territory = i.get("km_state")
-				new_district_territory.territory_name = i.get("km_district_case")
-				new_district_territory.save()
+		if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":state ,"territory_name":district}) and  \
+		state and district:
+			new_district_territory = frappe.new_doc("Territory")
+			new_district_territory.is_group = 1
+			new_district_territory.parent_territory = state
+			new_district_territory.territory_name = district
+			new_district_territory.save()
 
-				if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":i.get("km_district_case") ,"territory_name":i.get("km_mandal_case")}) and i.get("km_mandal_case"):
-					new_mandel_territory = frappe.new_doc("Territory")
-					new_mandel_territory.is_group= 1
-					new_mandel_territory.parent_territory = i.get("km_district_case")
-					new_mandel_territory.territory_name = i.get("km_mandal_case")
-					new_mandel_territory.save()
+		if frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":district ,"territory_name":mandal}):
+			mandal = mandal
+		elif frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":district ,"territory_name":mandal + " (" + district + ")"}):
+			mandal = mandal + " (" + district + ")"
+		elif frappe.get_all("Territory",filters = {"territory_name":mandal}):
+			mandal = mandal + " (" + district + ")"
+		if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":district ,"territory_name":mandal}) and \
+		district and mandal:
+			new_mandal_territory = frappe.new_doc("Territory")
+			new_mandal_territory.is_group = 1
+			new_mandal_territory.parent_territory = district
+			new_mandal_territory.territory_name = mandal
+			new_mandal_territory.save()
+ 		
 
-					if not frappe.get_all("Territory",filters = {"parent_territory":i.get("km_mandal_case") ,"territory_name":i.get("km_village_case")}) and i.get("km_village_case"):
-						new_village_territory = frappe.new_doc("Territory")
-						new_village_territory.is_group= 1
-						new_village_territory.parent_territory = i.get("km_mandal_case")
-						new_village_territory.territory_name = i.get("km_village_case")
-						new_village_territory.save()			
+		if frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}):
+			village = village
+		elif frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village + " (" + mandal + ")"}):
+			village = village + " (" + mandal + ")"
+		elif frappe.get_all("Territory",filters = {"territory_name":village}):
+			village = village + " (" + mandal + ")"
+		if not frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}) and \
+		mandal and village:
+			new_village_territory = frappe.new_doc("Territory")
+			new_village_territory.parent_territory = mandal
+			new_village_territory.territory_name = village
+			new_village_territory.save()			
 
 		frappe.db.sql("""insert into `tabIssue`
 		(subject, description, creation, name, modified, owner, resolution_details, modified_by,
 		km_resolution_type, km_caller_name, km_are_you_calling_for_yourself, km_caller_relationship_with_farmer,
 		km_mandal_case, km_village_case, km_caste_category, km_caste, contact, km_other_caste, km_case_category,
-		km_district_case, km_relation, km_relation_name, raised_by, lead) values
-		(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+		km_district_case, km_relation, km_relation_name, raised_by, lead, sid, recording_url, communication_medium, 
+		km_state_case, km_call_type, km_priority) values
+		(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
 		(i.get("subject"), i.get("description"), creation, name, modified,
 		modified_by, i.get("resolution_details"), modified_by, i.get("km_resolution_type"),
 		i.get("km_caller_name"), str(km_are_you_calling_for_yourself), i.get("km_caller_relationship_with_farmer"),
-		i.get("km_mandal_case"), i.get("km_village_case"), i.get("km_caste_category"), i.get("km_caste"),
-		contact, i.get("km_other_caste"), i.get("km_case_category"),
-		i.get("km_district_case"), i.get("km_relation"), i.get("km_relation_name"), modified_by, lead))
+		mandal, village, i.get("km_caste_category"), i.get("km_caste"),
+		contact, i.get("km_other_caste"), i.get("km_case_category"),district, i.get("km_relation"), 
+		i.get("km_relation_name"), modified_by, lead, i.get("sid"), i.get("recording_url"), 'Phone', 
+		state, i.get("km_call_type"), i.get("km_priority")))
 	frappe.db.commit()		
 
 
@@ -278,4 +306,93 @@ def phone_call():
 							m.contact = new_contact.name
 							m.save()
 
-	frappe.db.commit()			  	
+	frappe.db.commit()	
+
+
+@frappe.whitelist()
+def vikarabad():
+	vikarabad_list=[]
+	vikarabad_village_list=[]
+	duplicate_village_list = []
+	with open('/home/deepak/Desktop/Vikarabad_Mapping.csv') as kmdata:
+   		reader = csv.DictReader(kmdata)
+   		for row in reader:
+   			dict = {"mandal":row.get("mandal"),"Village":row.get("Village")}
+   			vikarabad_village_list.append(row.get("Village"))
+   			vikarabad_list.append(dict)	
+   		unique_village_list = list(set(vikarabad_village_list))
+   		for i in unique_village_list:
+   			m = [ j for j in vikarabad_village_list if j == i]
+   			if len(m) > 1:
+   				duplicate_village_list.append(m[0])		
+	for vkb in vikarabad_list:	
+		mandal = str(vkb.get("mandal"))
+		village = str(vkb.get("Village"))
+
+		if [ k for k in duplicate_village_list if k == vkb.get("Village")]:
+			village = village + " (" + mandal + ")"
+
+		if mandal == "Vikarabad":
+			mandal = "Vikarabad(M)"
+		if village == "Vikarabad":
+			village = "Vikarabad(V)"
+		if frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":"Vikarabad" ,"territory_name":village}):
+			village = village + " (" + mandal + ")"	
+
+		if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":"Vikarabad" ,"territory_name":mandal}) and mandal:
+			new_mandal_territory = frappe.new_doc("Territory")
+			new_mandal_territory.is_group = 1
+			new_mandal_territory.parent_territory = "Vikarabad"
+			new_mandal_territory.territory_name = mandal
+			new_mandal_territory.save()
+
+		if not frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}) and mandal and village:
+			new_village_territory = frappe.new_doc("Territory")
+			new_village_territory.parent_territory = mandal
+			new_village_territory.territory_name = village
+			new_village_territory.save()
+
+	frappe.db.commit()					
+   	return 	True
+
+
+@frappe.whitelist()
+def adilabad():
+	adilabad_list=[]
+	adilabad_village_list=[]
+	duplicate_village_list = []
+
+	with open('/home/deepak/Desktop/Adilabad_Mapping.csv') as kmdata:
+   		reader = csv.DictReader(kmdata)
+   		for row in reader:
+   			dict = {"Mandal":row.get("Mandal"),"Village":row.get("Village")}
+   			adilabad_village_list.append(row.get("Village"))	
+   			adilabad_list.append(dict)
+   		unique_village_list = list(set(adilabad_village_list))
+   		for i in unique_village_list:
+   			m = [ j for j in adilabad_village_list if j == i]
+   			if len(m) > 1:
+   				duplicate_village_list.append(m[0])
+	for albd in adilabad_list:	
+		mandal = str(albd.get("Mandal"))
+		village = str(albd.get("Village"))
+		if [ k for k in duplicate_village_list if k == albd.get("Village")]:
+			village = village + " (" + mandal + ")"
+		if frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":"Adilabad" ,"territory_name":village}):
+			village = village + " (" + mandal + ")"		
+
+		if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":"Adilabad" ,"territory_name":mandal}) and mandal:
+			new_mandal_territory = frappe.new_doc("Territory")
+			new_mandal_territory.is_group = 1
+			new_mandal_territory.parent_territory = "Adilabad"
+			new_mandal_territory.territory_name = mandal
+			new_mandal_territory.save()
+
+		if not frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}) and mandal and village:
+			new_village_territory = frappe.new_doc("Territory")
+			new_village_territory.parent_territory = mandal
+			new_village_territory.territory_name = village
+			new_village_territory.save()
+		
+	frappe.db.commit()					
+   	return 	True

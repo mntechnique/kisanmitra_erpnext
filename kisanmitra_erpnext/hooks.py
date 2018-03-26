@@ -144,5 +144,8 @@ fixtures = [
 									"Communication-km_call_duration",
 									"Communication-km_call_gateway",
 									"Communication-km_calls_start_time",
-									"Communication-km_calls_end_time"]]]
+									"Communication-km_calls_end_time",
+									"Issue-km_state_case",
+									"Issue-km_call_type",
+									"Issue-km_priority"]]]
 	}]
