@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+import os
 import csv
 import re
 from datetime import datetime
@@ -9,7 +10,9 @@ from frappe.model.naming import make_autoname
 def lead():
 	lead_list=[]
 	contact_list=[]
-	with open('/home/deepak/Desktop/kisanmitra (copy).csv') as kmdata:
+	file_name = (frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").import_lead).strip("/files")
+	lead_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
+	with open(lead_file_path) as kmdata:
    		reader = csv.DictReader(kmdata)
    		for row in reader:
 			lead_list.append(row.get("Contacts First Name")+" "+row.get("Contacts Last Name"))
@@ -54,7 +57,9 @@ def lead():
 @frappe.whitelist()
 def issue():
 	issue_list=[]
-	with open('/home/deepak/Desktop/KMissue.csv') as kmdata:
+	file_name = (frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").import_issue).strip("/files")
+	issue_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
+	with open(issue_file_path) as kmdata:
    		reader = csv.DictReader(kmdata)
    		for row in reader:
 			dict={"subject":row.get("Case Title"),
@@ -178,7 +183,9 @@ def issue():
 @frappe.whitelist()
 def comment():
 	comment_list=[]
-	with open('/home/deepak/Desktop/KMComments.csv') as kmdata:
+	file_name = (frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").import_comments).strip("/files")
+	comment_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
+	with open(comment_file_path) as kmdata:
    		reader = csv.DictReader(kmdata)
    		for row in reader:
    			dict={"case_number":row.get("Cases Case Number") ,
@@ -225,7 +232,9 @@ def comment():
 @frappe.whitelist()
 def phone_call():
 	phone_call_list=[]
-	with open('/home/deepak/Desktop/KMPhone_call.csv') as kmdata:
+	file_name = (frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").import_phone_call).strip("/files")
+	phone_call_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
+	with open(phone_call_file_path) as kmdata:
    		reader = csv.DictReader(kmdata)
    		for row in reader:
    			dict={"case_number":row.get("Cases Case Number") ,
@@ -305,7 +314,6 @@ def phone_call():
 						if m.contact == '':
 							m.contact = new_contact.name
 							m.save()
-
 	frappe.db.commit()	
 
 
@@ -346,14 +354,13 @@ def vikarabad():
 			new_mandal_territory.territory_name = mandal
 			new_mandal_territory.save()
 
-		if not frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}) and mandal and village:
+		if not frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}) and \
+		not frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village + " (" + mandal + ")"}) and mandal and village:
 			new_village_territory = frappe.new_doc("Territory")
 			new_village_territory.parent_territory = mandal
 			new_village_territory.territory_name = village
 			new_village_territory.save()
-
-	frappe.db.commit()					
-   	return 	True
+	frappe.db.commit()
 
 
 @frappe.whitelist()
@@ -388,11 +395,10 @@ def adilabad():
 			new_mandal_territory.territory_name = mandal
 			new_mandal_territory.save()
 
-		if not frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}) and mandal and village:
+		if not frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}) and \
+		not frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village + " (" + mandal + ")"}) and mandal and village:
 			new_village_territory = frappe.new_doc("Territory")
 			new_village_territory.parent_territory = mandal
 			new_village_territory.territory_name = village
-			new_village_territory.save()
-		
-	frappe.db.commit()					
-   	return 	True
+			new_village_territory.save()	
+	frappe.db.commit()
