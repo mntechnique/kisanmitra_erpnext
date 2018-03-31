@@ -322,7 +322,9 @@ def vikarabad():
 	vikarabad_list=[]
 	vikarabad_village_list=[]
 	duplicate_village_list = []
-	with open('/home/deepak/Desktop/Vikarabad_Mapping.csv') as kmdata:
+	file_name = (frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").import_vikarabad).strip("/files")
+	vikarabad_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
+	with open(vikarabad_file_path) as kmdata:
    		reader = csv.DictReader(kmdata)
    		for row in reader:
    			dict = {"mandal":row.get("mandal"),"Village":row.get("Village")}
@@ -369,7 +371,9 @@ def adilabad():
 	adilabad_village_list=[]
 	duplicate_village_list = []
 
-	with open('/home/deepak/Desktop/Adilabad_Mapping.csv') as kmdata:
+	file_name = (frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").import_adilabad).strip("/files")
+	adilabad_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
+	with open(adilabad_file_path) as kmdata:
    		reader = csv.DictReader(kmdata)
    		for row in reader:
    			dict = {"Mandal":row.get("Mandal"),"Village":row.get("Village")}
