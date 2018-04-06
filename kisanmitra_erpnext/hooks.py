@@ -120,3 +120,32 @@ app_license = "MIT"
 # 	"frappe.desk.doctype.event.event.get_events": "kisanmitra_erpnext.event.get_events"
 # }
 
+fixtures = [
+	{
+		"dt":"Custom Field", 
+		"filters": [["name", "in", ["Issue-section_break_28",
+									"Issue-km_resolution_type",
+									"Issue-km_caller_name",
+									"Issue-km_are_you_calling_for_yourself",
+									"Issue-km_caller_relationship_with_farmer",
+									"Issue-km_mandal_case",
+									"Issue-km_village_case",
+									"Issue-km_caste_category",
+									"Issue-column_break_36",
+									"Issue-km_caste",
+									"Issue-km_other_caste",
+									"Issue-km_case_category",
+									"Issue-km_district_case",
+									"Issue-km_relation",
+									"Communication-section_break_48",
+									"Communication-km_call_status",
+									"Communication-km_call_customer",
+									"Communication-column_break_52",
+									"Communication-km_call_duration",
+									"Communication-km_call_gateway",
+									"Communication-km_calls_start_time",
+									"Communication-km_calls_end_time",
+									"Issue-km_state_case",
+									"Issue-km_call_type",
+									"Issue-km_priority"]]]
+	}]
