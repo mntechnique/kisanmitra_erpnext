@@ -5,59 +5,54 @@ import csv
 import re
 from datetime import datetime
 from frappe.model.naming import make_autoname
+from frappe.core.page.background_jobs.background_jobs import get_info
 
 @frappe.whitelist()
 def lead_outer():
-	lead_inner()
 	if not is_queue_running('kisanmitra_erpnext.api.lead_inner'):
 		result = frappe.enqueue('kisanmitra_erpnext.api.lead_inner',
-			queue="long"
+			queue="long",timeout=3500
 		)
 
 
 @frappe.whitelist()
 def issue_outer():
-	issue_inner()
 	if not is_queue_running('kisanmitra_erpnext.api.issue_inner'):
 		result = frappe.enqueue('kisanmitra_erpnext.api.issue_inner',
-			queue="long"
+			queue="long",timeout=3500
 		)
 
 
 @frappe.whitelist()
 def comment_outer():
-	comment_inner()
 	if not is_queue_running('kisanmitra_erpnext.api.comment_inner'):
 		result = frappe.enqueue('kisanmitra_erpnext.api.comment_inner',
-			queue="long"
+			queue="long",timeout=3500
 		)
 
 
 @frappe.whitelist()
 def phone_call_outer():
-	phone_call_inner()
 	if not is_queue_running('kisanmitra_erpnext.api.phone_call_inner'):
 		result = frappe.enqueue('kisanmitra_erpnext.api.phone_call_inner',
-			queue="long"
+			queue="long",timeout=3500
 		)
 
 
 @frappe.whitelist()
 def vikarabad_outer():
-	lead_inner()
 	if not is_queue_running('kisanmitra_erpnext.api.vikarabad_inner'):
 		result = frappe.enqueue('kisanmitra_erpnext.api.vikarabad_inner',
-			queue="long"
+			queue="long",timeout=3500
 		)
 
 
 
 @frappe.whitelist()
 def adilabad_outer():
-	lead_inner()
 	if not is_queue_running('kisanmitra_erpnext.api.adilabad_inner'):
 		result = frappe.enqueue('kisanmitra_erpnext.api.adilabad_inner',
-			queue="long"
+			queue="long",timeout=3500
 		)										
 
 
@@ -80,7 +75,7 @@ def lead_inner():
 				contact_list.append(dict)
 
 		unique_lead = list(set(lead_list))
-		msg.print("importing lead started",alert=True)
+		frappe.msgprint("importing lead started",alert=True)
 
 		for i in unique_lead:
 			
@@ -92,23 +87,27 @@ def lead_inner():
 			if modified_by_name == "Visheshwar Rao":
 				modified_by_name = "Vishesh rao Urvetha"
 			modified_by = (frappe.get_all("User" , filters = {"full_name":modified_by_name})[0]).get("name")
-			
-			frappe.db.sql("""insert into `tabLead`
-			(organization_lead,lead_name,company_name, name, creation, modified, owner,
-			modified_by) values
-			(1,%s,%s,%s,%s,%s,%s,%s,%s)""",(i,i,name,creation,modified,modified_by, modified_by))
 
-			new_contact = frappe.new_doc("Contact")
-			new_contact.first_name = contact_details.get("first_name")
-			new_contact.last_name = contact_details.get("last_name")
-			new_contact.mobile_no = contact_details.get("mobile")
-			new_contact.append("links",{
-				"link_doctype":"Lead",
-				"link_name":name
-				})
-			new_contact.save()
+			if contact_details.get("mobile") == "" or not frappe.get_all("Contact",filters = {"mobile_no":contact_details.get("mobile")}):
+			
+				frappe.db.sql("""insert into `tabLead`
+				(organization_lead,lead_name,company_name, name, creation, modified, owner,
+				modified_by) values
+				(1,%s,%s,%s,%s,%s,%s,%s)""",(i,i,name,creation,modified,modified_by, modified_by))
+
+				new_contact = frappe.new_doc("Contact")
+				new_contact.first_name = contact_details.get("first_name")
+				new_contact.last_name = contact_details.get("last_name")
+				new_contact.mobile_no = contact_details.get("mobile")
+				new_contact.append("links",{
+					"link_doctype":"Lead",
+					"link_name":name
+					})
+				new_contact.save()
 		frappe.db.commit() 
+		frappe.log_error(message="Lead import completed", title="Lead import completed")
 	except Exception as e:
+		frappe.db.rollback()
     	frappe.log_error(message=frappe.get_traceback(), title="Error in lead import")	
 
 
@@ -116,39 +115,40 @@ def issue_inner():
 	issue_list=[]
 	file_name = (frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").import_issue).strip("/files")
 	issue_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
-		with open(issue_file_path) as kmdata:
-	   		reader = csv.DictReader(kmdata)
-	   		for row in reader:
-				dict={"subject":row.get("Case Title"),
-					  "description":row.get("Summary"),
-					  "creation":row.get("Created Date"),
-					  "name":row.get("Case Number"),
-					  "modified":row.get("Modified Time"),
-					  "owner":row.get("Created By"),
-					  "resolution_details":row.get("Resolution"),
-					  "modified_by":row.get("Last Modified By"),
-					  "km_resolution_type":row.get("Resolution Type"),
-					  "km_caller_name":row.get("Caller Name"),
-					  "km_are_you_calling_for_yourself":row.get("Are you calling for yourself"),
-					  "km_caller_relationship_with_farmer":row.get("Caller relationship with Farmer"),
-					  "km_mandal_case":row.get("Mandal case"),
-					  "km_village_case":row.get("Village Case"),
-					  "km_caste_category":row.get("Caste Category"),
-					  "km_caste":row.get("Caste"),
-					  "recording_url":row.get("Phone Calls Recording"),
-					  "sid":row.get("Phone Calls Source UUID"),
-					  "km_other_caste":row.get("Other Caste"),
-					  "km_case_category":row.get("Case Category"),
-					  "farmer_name":row.get("Farmer Name"),
-					  "km_state_case":"Telangana",
-					  # "km_state_case":row.get("State Case"),
-					  "km_district_case":row.get("District case"),
-					  "km_relation":row.get("Relation"),
-					  "km_relation_name":row.get("Relation Name"),
-					  "km_call_type":row.get("Call Type") ,
-					  "km_priority":row.get("Priority")}
-				issue_list.append(dict)	
-		msg.print("importing issue started",alert=True)		
+		try:
+			with open(issue_file_path) as kmdata:
+		   		reader = csv.DictReader(kmdata)
+		   		for row in reader:
+					dict={"subject":row.get("Case Title"),
+						  "description":row.get("Summary"),
+						  "creation":row.get("Created Date"),
+						  "name":row.get("Case Number"),
+						  "modified":row.get("Modified Time"),
+						  "owner":row.get("Created By"),
+						  "resolution_details":row.get("Resolution"),
+						  "modified_by":row.get("Last Modified By"),
+						  "km_resolution_type":row.get("Resolution Type"),
+						  "km_caller_name":row.get("Caller Name"),
+						  "km_are_you_calling_for_yourself":row.get("Are you calling for yourself"),
+						  "km_caller_relationship_with_farmer":row.get("Caller relationship with Farmer"),
+						  "km_mandal_case":row.get("Mandal case"),
+						  "km_village_case":row.get("Village Case"),
+						  "km_caste_category":row.get("Caste Category"),
+						  "km_caste":row.get("Caste"),
+						  "recording_url":row.get("Phone Calls Recording"),
+						  "sid":row.get("Phone Calls Source UUID"),
+						  "km_other_caste":row.get("Other Caste"),
+						  "km_case_category":row.get("Case Category"),
+						  "farmer_name":row.get("Farmer Name"),
+						  "km_state_case":"Telangana",
+						  # "km_state_case":row.get("State Case"),
+						  "km_district_case":row.get("District case"),
+						  "km_relation":row.get("Relation"),
+						  "km_relation_name":row.get("Relation Name"),
+						  "km_call_type":row.get("Call Type") ,
+						  "km_priority":row.get("Priority")}
+					issue_list.append(dict)	
+		frappe.msgprint("importing issue started",alert=True)		
 		for i in issue_list:
 			
 			name_prifix = 'VKB-' if str(i.get("name"))[0]=='V' or str(i.get("name"))[0]=='v' else 'KM-'
@@ -235,8 +235,10 @@ def issue_inner():
 			contact, i.get("km_other_caste"), i.get("km_case_category"),district, i.get("km_relation"), 
 			i.get("km_relation_name"), modified_by, lead, i.get("sid"), i.get("recording_url"), 'Phone', 
 			state, i.get("km_call_type"), i.get("km_priority")))
-		frappe.db.commit()		
+		frappe.db.commit()
+		frappe.log_error(message="Issue import completed", title="Issue import completed")		
 	except Exception as e:
+		frappe.db.rollback()
     	frappe.log_error(message=frappe.get_traceback(), title="Error in issue import")
 
 
@@ -256,7 +258,7 @@ def comment_inner():
 	   				  "modified":row.get("Comments Modified Time")}
 				comment_list.append(dict)
 
-		msg.print("importing comments started",alert=True)
+		frappe.msgprint("importing comments started",alert=True)
 		for i in comment_list:
 			reference_name=''
 			reference_doctype = ''
@@ -286,8 +288,10 @@ def comment_inner():
 			('Comment','Comment',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
 			(i.get("content"),modified_by, i.get("subject"), reference_doctype, reference_name, creation,
 			modified_by, creation, modified, modified_by, name ,status, sender_full_name, 'Send'))
-		frappe.db.commit()		
+		frappe.db.commit()	
+		frappe.log_error(message="Comments import completed", title="Comments import completed")	
 	except Exception as e:
+		frappe.db.rollback()
     	frappe.log_error(message=frappe.get_traceback(), title="Error in comments import")	
 
 
@@ -317,7 +321,7 @@ def phone_call_inner():
 	   				  "km_call_gateway":row.get("Phone Calls Gateway")}
 				phone_call_list.append(dict)
 
-		msg.print("importing phone_call started",alert=True)		
+		frappe.msgprint("importing phone_call started",alert=True)		
 		for i in phone_call_list:
 			if i.get("modified_by"):
 				reference_name=''
@@ -379,8 +383,10 @@ def phone_call_inner():
 							if m.contact == '':
 								m.contact = new_contact.name
 								m.save()
-		frappe.db.commit()	
+		frappe.db.commit()
+		frappe.log_error(message="Phone call import completed", title="Phone call import completed")	
 	except Exception as e:
+		frappe.db.rollback()
     	frappe.log_error(message=frappe.get_traceback(), title="Error in phone_call import")		
 
 
@@ -392,6 +398,7 @@ def vikarabad_inner():
 	file_name = (frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").import_vikarabad).strip("/files")
 	vikarabad_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
 	try:
+		frappe.msgprint("importing started",alert=True)
 		with open(vikarabad_file_path) as kmdata:
 	   		reader = csv.DictReader(kmdata)
 	   		for row in reader:
@@ -431,7 +438,9 @@ def vikarabad_inner():
 				new_village_territory.territory_name = village
 				new_village_territory.save()
 		frappe.db.commit()
+		frappe.log_error(message="Vikarabad import completed", title="Vikarabad import completed")
 	except Exception as e:
+		frappe.db.rollback()
     	frappe.log_error(message=frappe.get_traceback(), title="Error in vikarabad import")	
 
 
@@ -444,6 +453,7 @@ def adilabad_inner():
 	file_name = (frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").import_adilabad).strip("/files")
 	adilabad_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
 	try:
+		frappe.msgprint("importing started",alert=True)
 		with open(adilabad_file_path) as kmdata:
 	   		reader = csv.DictReader(kmdata)
 	   		for row in reader:
@@ -477,5 +487,17 @@ def adilabad_inner():
 				new_village_territory.territory_name = village
 				new_village_territory.save()	
 		frappe.db.commit()
+		frappe.log_error(message="Adilabad import completed", title="Adilabad import completed")
 	except Exception as e:
-    	frappe.log_error(message=frappe.get_traceback(), title="Error in adilabad import")		
+		frappe.db.rollback()
+    	frappe.log_error(message=frappe.get_traceback(), title="Error in adilabad import")	
+
+
+def get_job_queue(job_name):
+	queue_info = get_info()
+	queue_by_job_name = [queue for queue in queue_info if queue.get("job_name")==job_name]
+	return queue_by_job_name
+
+def is_queue_running(job_name):
+	queue = get_job_queue(job_name)
+	return queue and len(queue) > 0 and queue[0].get("status") in ["started", "queued"]
