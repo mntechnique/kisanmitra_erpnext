@@ -131,7 +131,7 @@ fixtures = [
 									"Issue-km_mandal_case",
 									"Issue-km_village_case",
 									"Issue-km_caste_category",
-									"Issue-column_break_36",
+									"Issue-column_break_35",
 									"Issue-km_caste",
 									"Issue-km_other_caste",
 									"Issue-km_case_category",
@@ -147,5 +147,6 @@ fixtures = [
 									"Communication-km_calls_end_time",
 									"Issue-km_state_case",
 									"Issue-km_call_type",
-									"Issue-km_priority"]]]
+									"Issue-km_priority",
+									"Issue-km_relation_name"]]]
 	}]
