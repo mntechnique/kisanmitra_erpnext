@@ -82,8 +82,8 @@ def lead_inner():
 			contact_details = [j for j in contact_list if i == (j.get("first_name")+" "+j.get("last_name"))][0]
 			modified_by_name = contact_details.get("modified_by")
 			name = str(make_autoname('LEAD-','#####'))
-			creation = frappe.utils.get_datetime_str(datetime.strptime(contact_details.get("creation"), "%d-%m-%Y %I:%M %p"))
-			modified = frappe.utils.get_datetime_str(datetime.strptime(contact_details.get("modified"), "%d-%m-%Y %I:%M %p"))
+			creation = frappe.utils.get_datetime_str(datetime.strptime(contact_details.get("creation"), "%Y-%m-%d %I:%M %p"))
+			modified = frappe.utils.get_datetime_str(datetime.strptime(contact_details.get("modified"), "%Y-%m-%d %I:%M %p"))
 			if modified_by_name == "Visheshwar Rao":
 				modified_by_name = "Vishesh rao Urvetha"
 			modified_by = (frappe.get_all("User" , filters = {"full_name":modified_by_name})[0]).get("name")
@@ -115,39 +115,39 @@ def issue_inner():
 	issue_list=[]
 	file_name = (frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").import_issue).strip("/files")
 	issue_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
-		try:
-			with open(issue_file_path) as kmdata:
-		   		reader = csv.DictReader(kmdata)
-		   		for row in reader:
-					dict={"subject":row.get("Case Title"),
-						  "description":row.get("Summary"),
-						  "creation":row.get("Created Date"),
-						  "name":row.get("Case Number"),
-						  "modified":row.get("Modified Time"),
-						  "owner":row.get("Created By"),
-						  "resolution_details":row.get("Resolution"),
-						  "modified_by":row.get("Last Modified By"),
-						  "km_resolution_type":row.get("Resolution Type"),
-						  "km_caller_name":row.get("Caller Name"),
-						  "km_are_you_calling_for_yourself":row.get("Are you calling for yourself"),
-						  "km_caller_relationship_with_farmer":row.get("Caller relationship with Farmer"),
-						  "km_mandal_case":row.get("Mandal case"),
-						  "km_village_case":row.get("Village Case"),
-						  "km_caste_category":row.get("Caste Category"),
-						  "km_caste":row.get("Caste"),
-						  "recording_url":row.get("Phone Calls Recording"),
-						  "sid":row.get("Phone Calls Source UUID"),
-						  "km_other_caste":row.get("Other Caste"),
-						  "km_case_category":row.get("Case Category"),
-						  "farmer_name":row.get("Farmer Name"),
-						  "km_state_case":"Telangana",
-						  # "km_state_case":row.get("State Case"),
-						  "km_district_case":row.get("District case"),
-						  "km_relation":row.get("Relation"),
-						  "km_relation_name":row.get("Relation Name"),
-						  "km_call_type":row.get("Call Type") ,
-						  "km_priority":row.get("Priority")}
-					issue_list.append(dict)	
+	try:
+		with open(issue_file_path) as kmdata:
+	   		reader = csv.DictReader(kmdata)
+	   		for row in reader:
+				dict={"subject":row.get("Case Title"),
+					  "description":row.get("Summary"),
+					  "creation":row.get("Created Date"),
+					  "name":row.get("Case Number"),
+					  "modified":row.get("Modified Time"),
+					  "owner":row.get("Created By"),
+					  "resolution_details":row.get("Resolution"),
+					  "modified_by":row.get("Last Modified By"),
+					  "km_resolution_type":row.get("Resolution Type"),
+					  "km_caller_name":row.get("Caller Name"),
+					  "km_are_you_calling_for_yourself":row.get("Are you calling for yourself"),
+					  "km_caller_relationship_with_farmer":row.get("Caller relationship with Farmer"),
+					  "km_mandal_case":row.get("Mandal case"),
+					  "km_village_case":row.get("Village Case"),
+					  "km_caste_category":row.get("Caste Category"),
+					  "km_caste":row.get("Caste"),
+					  "recording_url":row.get("Phone Calls Recording"),
+					  "sid":row.get("Phone Calls Source UUID"),
+					  "km_other_caste":row.get("Other Caste"),
+					  "km_case_category":row.get("Case Category"),
+					  "farmer_name":row.get("Farmer Name"),
+					  "km_state_case":"Telangana",
+					  # "km_state_case":row.get("State Case"),
+					  "km_district_case":row.get("District case"),
+					  "km_relation":row.get("Relation"),
+					  "km_relation_name":row.get("Relation Name"),
+					  "km_call_type":row.get("Call Type") ,
+					  "km_priority":row.get("Priority")}
+				issue_list.append(dict)	
 		frappe.msgprint("importing issue started",alert=True)		
 		for i in issue_list:
 			
@@ -156,8 +156,8 @@ def issue_inner():
 			while len(name_suffix) < 5:
 				name_suffix = '0' + name_suffix
 			name =str(str(name_prifix) + name_suffix)
-			creation = frappe.utils.get_datetime_str(datetime.strptime(i.get("creation"), "%d-%m-%Y %I:%M %p"))
-			modified = frappe.utils.get_datetime_str(datetime.strptime(i.get("modified"), "%d-%m-%Y %I:%M %p"))
+			creation = frappe.utils.get_datetime_str(datetime.strptime(i.get("creation"), "%Y-%m-%d %I:%M %p"))
+			modified = frappe.utils.get_datetime_str(datetime.strptime(i.get("modified"), "%Y-%m-%d %I:%M %p"))
 			modified_by_name = i.get("modified_by")
 			if modified_by_name == "Visheshwar Rao":
 				modified_by_name = "Vishesh rao Urvetha"
@@ -177,7 +177,7 @@ def issue_inner():
 	 		village = str(i.get("km_mandal_case"))
 						
 			
-			if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":"All Territories" ,"territory_name":state}) and \
+			if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":"India" ,"territory_name":state}) and \
 			state:
 				new_state_territory = frappe.new_doc("Territory")
 				new_state_territory.is_group = 1
@@ -501,3 +501,15 @@ def get_job_queue(job_name):
 def is_queue_running(job_name):
 	queue = get_job_queue(job_name)
 	return queue and len(queue) > 0 and queue[0].get("status") in ["started", "queued"]
+
+
+
+def test():
+	new_list = []
+	with open('/home/deepak/Desktop/km_data_import/Contact.csv') as kmdata:
+   		reader = csv.DictReader(kmdata)
+   		for row in reader:
+   			# dict = {"Mandal":row.get("Mandal"),"Village":row.get("Village")}
+   			new_list.append(row.get("Contacts Last Modified By"))
+   	return new_list		
+
