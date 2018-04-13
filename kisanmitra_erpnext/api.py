@@ -135,8 +135,6 @@ def issue_inner():
 					  "km_village_case":row.get("Village Case"),
 					  "km_caste_category":row.get("Caste Category"),
 					  "km_caste":row.get("Caste"),
-					  "recording_url":row.get("Phone Calls Recording"),
-					  "sid":row.get("Phone Calls Source UUID"),
 					  "km_other_caste":row.get("Other Caste"),
 					  "km_case_category":row.get("Case Category"),
 					  "farmer_name":row.get("Farmer Name"),
@@ -225,15 +223,15 @@ def issue_inner():
 			(subject, description, creation, name, modified, owner, resolution_details, modified_by,
 			km_resolution_type, km_caller_name, km_are_you_calling_for_yourself, km_caller_relationship_with_farmer,
 			km_mandal_case, km_village_case, km_caste_category, km_caste, contact, km_other_caste, km_case_category,
-			km_district_case, km_relation, km_relation_name, raised_by, lead, sid, recording_url, communication_medium, 
+			km_district_case, km_relation, km_relation_name, raised_by, lead, 
 			km_state_case, km_call_type, km_priority) values
-			(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+			(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
 			(i.get("subject"), i.get("description"), creation, name, modified,
 			modified_by, i.get("resolution_details"), modified_by, i.get("km_resolution_type"),
 			i.get("km_caller_name"), str(km_are_you_calling_for_yourself), i.get("km_caller_relationship_with_farmer"),
 			mandal, village, i.get("km_caste_category"), i.get("km_caste"),
 			contact, i.get("km_other_caste"), i.get("km_case_category"),district, i.get("km_relation"), 
-			i.get("km_relation_name"), modified_by, lead, i.get("sid"), i.get("recording_url"), 'Phone', 
+			i.get("km_relation_name"), modified_by, lead, 
 			state, i.get("km_call_type"), i.get("km_priority")))
 		frappe.db.commit()
 		frappe.log_error(message="Issue import completed", title="Issue import completed")		
@@ -317,6 +315,8 @@ def phone_call_inner():
 	   				  "phone_no":row.get("Phone Calls Customer Number"),
 	   				  "km_calls_start_time":row.get("Phone Calls Start Time"),
 	   				  "km_calls_end_time":row.get("Phone Calls End Time"),
+	   				  "recording_url":row.get("Phone Calls Recording"),
+					  "sid":row.get("Phone Calls Source UUID"),
 	   				  "km_call_duration":row.get("Phone Calls Duration (sec)"),
 	   				  "km_call_gateway":row.get("Phone Calls Gateway")}
 				phone_call_list.append(dict)
@@ -358,12 +358,12 @@ def phone_call_inner():
 				(comment_type, communication_type, reference_owner, subject, reference_doctype, reference_name, 
 				communication_date, user, creation, modified, modified_by, name , status, sender_full_name , sent_or_received , 
 				km_call_status , km_call_customer , phone_no , km_calls_start_time , km_calls_end_time , km_call_duration , 
-				km_call_gateway ,owner) values 
-				('Info', 'Communication', %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+				km_call_gateway , owner, sid, recording_url, communication_medium) values 
+				('Info', 'Communication', %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
 				(modified_by ,i.get("subject") ,reference_doctype ,reference_name ,creation ,modified_by, creation, modified, 
 				modified_by, name ,status ,sender_full_name ,sent_or_received ,i.get("km_call_status") ,i.get("km_call_customer") ,
 				i.get("phone_no") ,km_calls_start_time ,km_calls_end_time ,i.get("km_call_duration") ,
-				'Exotel' ,modified_by))
+				'Exotel' ,modified_by ,i.get("sid"), i.get("recording_url"), 'Phone'))
 
 				if row.get("Phone Calls Customer Number"):
 					if not len((frappe.get_all("Contact", filters={"mobile_no":row.get("Phone Calls Customer Number")}))):
