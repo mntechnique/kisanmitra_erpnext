@@ -211,7 +211,7 @@ def issue_inner():
 					new_mandal_territory.territory_name = mandal
 					new_mandal_territory.save()
 	 		
-			if mandel:
+			if mandal:
 				if frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}):
 					village = village
 				elif frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village + " (" + mandal + ")"}):
@@ -276,8 +276,8 @@ def comment_inner():
 				reference_doctype = "Issue"
 				status = "Linked"
 			name = frappe.generate_hash(length=10)
-			creation = frappe.utils.get_datetime_str(datetime.strptime(i.get("creation"), "%d-%m-%Y %I:%M %p"))
-			modified = frappe.utils.get_datetime_str(datetime.strptime(i.get("modified"), "%d-%m-%Y %I:%M %p"))
+			creation = frappe.utils.get_datetime_str(datetime.strptime(i.get("creation"), "%Y-%m-%d %I:%M %p"))
+			modified = frappe.utils.get_datetime_str(datetime.strptime(i.get("modified"), "%Y-%m-%d %I:%M %p"))
 			modified_by_name = i.get("reference_owner")
 			if modified_by_name == "Visheshwar Rao":
 				modified_by_name = "Vishesh rao Urvetha"
@@ -344,12 +344,12 @@ def phone_call_inner():
 					reference_doctype = "Issue"
 					status = "Linked"
 				name = frappe.generate_hash(length=10)
-				creation = frappe.utils.get_datetime_str(datetime.strptime(i.get("creation"), "%d-%m-%Y %I:%M %p"))
-				modified = frappe.utils.get_datetime_str(datetime.strptime(i.get("modified"), "%d-%m-%Y %I:%M %p"))
+				creation = frappe.utils.get_datetime_str(datetime.strptime(i.get("creation"), "%Y-%m-%d %I:%M %p"))
+				modified = frappe.utils.get_datetime_str(datetime.strptime(i.get("modified"), "%Y-%m-%d %I:%M %p"))
 				if i.get("km_calls_start_time"):
-					km_calls_start_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_start_time"), "%d-%m-%Y %I:%M %p"))
+					km_calls_start_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_start_time"), "%Y-%m-%d %I:%M %p"))
 				if i.get("km_calls_end_time"):
-					km_calls_end_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_end_time"), "%d-%m-%Y %I:%M %p"))
+					km_calls_end_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_end_time"), "%Y-%m-%d %I:%M %p"))
 				modified_by_name = i.get("reference_owner")
 				if modified_by_name == "Visheshwar Rao":
 					modified_by_name = "Vishesh rao Urvetha"
