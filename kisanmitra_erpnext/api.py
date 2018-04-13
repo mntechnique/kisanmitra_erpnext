@@ -173,6 +173,10 @@ def issue_inner():
 			district = str(i.get("km_district_case"))
 	 		mandal = str(i.get("km_mandal_case"))
 	 		village = str(i.get("km_mandal_case"))
+	 		if mandal == "Vikarabad":
+				mandal = "Vikarabad(M)"
+			if village == "Vikarabad":
+				village = "Vikarabad(V)"
 						
 			
 			if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":"India" ,"territory_name":state}) and \
