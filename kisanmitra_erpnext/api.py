@@ -187,41 +187,43 @@ def issue_inner():
 				new_state_territory.territory_name = state
 				new_state_territory.save()
 
-			if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":state ,"territory_name":district}) and  \
-			state and district:
-				new_district_territory = frappe.new_doc("Territory")
-				new_district_territory.is_group = 1
-				new_district_territory.parent_territory = state
-				new_district_territory.territory_name = district
-				new_district_territory.save()
+			if state:	
+				if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":state ,"territory_name":district}) and  \
+				district:
+					new_district_territory = frappe.new_doc("Territory")
+					new_district_territory.is_group = 1
+					new_district_territory.parent_territory = state
+					new_district_territory.territory_name = district
+					new_district_territory.save()
 
-			if frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":district ,"territory_name":mandal}):
-				mandal = mandal
-			elif frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":district ,"territory_name":mandal + " (" + district + ")"}):
-				mandal = mandal + " (" + district + ")"
-			elif frappe.get_all("Territory",filters = {"territory_name":mandal}):
-				mandal = mandal + " (" + district + ")"
-			if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":district ,"territory_name":mandal}) and \
-			district and mandal:
-				new_mandal_territory = frappe.new_doc("Territory")
-				new_mandal_territory.is_group = 1
-				new_mandal_territory.parent_territory = district
-				new_mandal_territory.territory_name = mandal
-				new_mandal_territory.save()
+			if district:	
+				if frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":district ,"territory_name":mandal}):
+					mandal = mandal
+				elif frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":district ,"territory_name":mandal + " (" + district + ")"}):
+					mandal = mandal + " (" + district + ")"
+				elif frappe.get_all("Territory",filters = {"territory_name":mandal}):
+					mandal = mandal + " (" + district + ")"
+				if not frappe.get_all("Territory",filters = {"is_group":1 ,"parent_territory":district ,"territory_name":mandal}) and \
+				mandal:
+					new_mandal_territory = frappe.new_doc("Territory")
+					new_mandal_territory.is_group = 1
+					new_mandal_territory.parent_territory = district
+					new_mandal_territory.territory_name = mandal
+					new_mandal_territory.save()
 	 		
-
-			if frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}):
-				village = village
-			elif frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village + " (" + mandal + ")"}):
-				village = village + " (" + mandal + ")"
-			elif frappe.get_all("Territory",filters = {"territory_name":village}):
-				village = village + " (" + mandal + ")"
-			if not frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}) and \
-			mandal and village:
-				new_village_territory = frappe.new_doc("Territory")
-				new_village_territory.parent_territory = mandal
-				new_village_territory.territory_name = village
-				new_village_territory.save()			
+			if mandel:
+				if frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}):
+					village = village
+				elif frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village + " (" + mandal + ")"}):
+					village = village + " (" + mandal + ")"
+				elif frappe.get_all("Territory",filters = {"territory_name":village}):
+					village = village + " (" + mandal + ")"
+				if not frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}) and \
+				village:
+					new_village_territory = frappe.new_doc("Territory")
+					new_village_territory.parent_territory = mandal
+					new_village_territory.territory_name = village
+					new_village_territory.save()			
 
 			frappe.db.sql("""insert into `tabIssue`
 			(subject, description, creation, name, modified, owner, resolution_details, modified_by,
