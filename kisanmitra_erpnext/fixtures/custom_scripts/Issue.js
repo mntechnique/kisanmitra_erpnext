@@ -1,9 +1,9 @@
 frappe.ui.form.on("Issue", {
 	refresh: function(frm) {
-		if (not frm.doc.km_state_case) {
+		if (!frm.doc.km_state_case) {
 			frm.set_value("km_state_case", "Telangana");
 		}
-		
+
 		frm.set_query("km_state_case", function() {
 			return {
 				filters: {
