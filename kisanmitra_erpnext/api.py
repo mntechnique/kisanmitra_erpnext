@@ -291,7 +291,7 @@ def comment_inner():
 			sender_full_name ,sent_or_received) values
 			('Comment','Comment',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
 			(i.get("content"),modified_by, i.get("subject"), reference_doctype, reference_name, creation,
-			modified_by, creation, modified, modified_by, name ,status, sender_full_name, 'Send'))
+			modified_by, creation, modified, modified_by, name ,status, sender_full_name, 'Sent'))
 		frappe.db.commit()	
 		frappe.log_error(message="Comments import completed", title="Comments import completed")	
 	except Exception as e:
@@ -358,7 +358,7 @@ def phone_call_inner():
 				if i.get("sent_or_received") == "inbound":
 					sent_or_received = "Received"
 				else :
-					sent_or_received = "Send"	
+					sent_or_received = "Sent"	
 
 				frappe.db.sql("""insert into `tabCommunication`
 				(comment_type, communication_type, reference_owner, subject, reference_doctype, reference_name, 
