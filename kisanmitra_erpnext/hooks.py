@@ -149,4 +149,10 @@ fixtures = [
 									"Issue-km_call_type",
 									"Issue-km_priority",
 									"Issue-km_relation_name"]]]
+	}, 
+	{
+		"dt":"Property Setter",
+		"filters": [["name", "in", [
+			"Issue-communication_medium-default"
+		]]]
 	}]

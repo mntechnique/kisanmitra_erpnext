@@ -1,0 +1,19 @@
+[
+ {
+  "_assign": null, 
+  "_comments": null, 
+  "_liked_by": null, 
+  "_user_tags": null, 
+  "default_value": null, 
+  "doc_type": "Issue", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "communication_medium", 
+  "modified": "2018-04-22 18:07:39.810175", 
+  "name": "Issue-communication_medium-default", 
+  "property": "default", 
+  "property_type": "Text", 
+  "value": "Phone"
+ }
+]
