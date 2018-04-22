@@ -1,5 +1,12 @@
 frappe.ui.form.on("Issue", {
 	refresh: function(frm) {
+		frm.set_query("km_state_case", function() {
+			return {
+				filters: {
+					"parent_territory": "India"
+				}
+			}
+		});
 		frm.set_query("km_district_case", function() {
 			return {
 				filters: {
