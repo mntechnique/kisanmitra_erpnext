@@ -172,7 +172,7 @@ def issue_inner():
 			state = str(i.get("km_state_case"))
 			district = str(i.get("km_district_case"))
 	 		mandal = str(i.get("km_mandal_case"))
-	 		village = str(i.get("km_mandal_case"))
+	 		village = str(i.get("km_village_case"))
 	 		if mandal == "Vikarabad":
 				mandal = "Vikarabad(M)"
 			if village == "Vikarabad":
@@ -507,15 +507,3 @@ def get_job_queue(job_name):
 def is_queue_running(job_name):
 	queue = get_job_queue(job_name)
 	return queue and len(queue) > 0 and queue[0].get("status") in ["started", "queued"]
-
-
-
-def test():
-	new_list = []
-	with open('/home/deepak/Desktop/km_data_import/Contact.csv') as kmdata:
-   		reader = csv.DictReader(kmdata)
-   		for row in reader:
-   			# dict = {"Mandal":row.get("Mandal"),"Village":row.get("Village")}
-   			new_list.append(row.get("Contacts Last Modified By"))
-   	return new_list		
-
