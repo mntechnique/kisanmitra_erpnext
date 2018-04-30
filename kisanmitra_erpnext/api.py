@@ -144,7 +144,8 @@ def issue_inner():
 					  "km_relation":row.get("Relation"),
 					  "km_relation_name":row.get("Relation Name"),
 					  "km_call_type":row.get("Call Type") ,
-					  "km_priority":row.get("Priority")}
+					  "km_priority":row.get("Priority"),
+					  "km_department":row.get("Department")}
 				issue_list.append(dict)	
 		frappe.msgprint("importing issue started",alert=True)		
 		for i in issue_list:
@@ -230,15 +231,15 @@ def issue_inner():
 			km_resolution_type, km_caller_name, km_are_you_calling_for_yourself, km_caller_relationship_with_farmer,
 			km_mandal_case, km_village_case, km_caste_category, km_caste, contact, km_other_caste, km_case_category,
 			km_district_case, km_relation, km_relation_name, raised_by, lead, 
-			km_state_case, km_call_type, km_priority) values
-			(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+			km_state_case, km_call_type, km_priority, km_department) values
+			(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
 			(i.get("subject"), i.get("description"), creation, name, modified,
 			modified_by, i.get("resolution_details"), modified_by, i.get("km_resolution_type"),
 			i.get("km_caller_name"), str(km_are_you_calling_for_yourself), i.get("km_caller_relationship_with_farmer"),
 			mandal, village, i.get("km_caste_category"), i.get("km_caste"),
 			contact, i.get("km_other_caste"), i.get("km_case_category"),district, i.get("km_relation"), 
 			i.get("km_relation_name"), modified_by, lead, 
-			state, i.get("km_call_type"), i.get("km_priority")))
+			state, i.get("km_call_type"), i.get("km_priority"), i.get("km_department")))
 		frappe.db.commit()
 		frappe.log_error(message="Issue import completed", title="Issue import completed")		
 	except Exception as e:
@@ -507,3 +508,12 @@ def get_job_queue(job_name):
 def is_queue_running(job_name):
 	queue = get_job_queue(job_name)
 	return queue and len(queue) > 0 and queue[0].get("status") in ["started", "queued"]
+
+
+def test():
+	new_list = []
+	with open('/home/deepak/Desktop/km_data_import/30-4-2018/km_issue.csv') as kmdata:
+   		reader = csv.DictReader(kmdata)
+   		for row in reader:
+   			new_list.append(row.get("Department"))
+   	return new_list		
