@@ -154,6 +154,7 @@ fixtures = [
 	{
 		"dt":"Property Setter",
 		"filters": [["name", "in", [
-			"Issue-communication_medium-default"
+			"Issue-communication_medium-default",
+			"Issue-status-options"
 		]]]
 	}]
