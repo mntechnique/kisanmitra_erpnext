@@ -15,5 +15,22 @@
   "property": "default", 
   "property_type": "Text", 
   "value": "Phone"
+ }, 
+ {
+  "_assign": null, 
+  "_comments": null, 
+  "_liked_by": null, 
+  "_user_tags": null, 
+  "default_value": null, 
+  "doc_type": "Issue", 
+  "docstatus": 0, 
+  "doctype": "Property Setter", 
+  "doctype_or_field": "DocField", 
+  "field_name": "status", 
+  "modified": "2018-05-03 18:46:03.238568", 
+  "name": "Issue-status-options", 
+  "property": "options", 
+  "property_type": "Text", 
+  "value": "Open\nReplied\nHold\nClosed\nNew\nWait for caller/farmer\nMandal Committee\nKisan Mitra\nDistrict Committee\nCollector Review\nWait for 3rd party\nAssigned \nResolved\nDeferred\nCollector Action Awaited\nPending to be Resolved\nKisanMitra Field Coordinator\nRDO\nField Visit Done\nInsurance Company\nPlanned\nPending after LRU"
  }
 ]
