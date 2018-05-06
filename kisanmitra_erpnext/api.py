@@ -384,7 +384,7 @@ def phone_call_inner():
 				(modified_by ,i.get("subject") ,reference_doctype ,reference_name ,creation ,modified_by, creation, modified, 
 				modified_by, name ,status ,sender_full_name ,sent_or_received ,i.get("km_call_status") ,i.get("km_call_customer") ,
 				i.get("phone_no") ,km_calls_start_time ,km_calls_end_time ,i.get("km_call_duration") ,
-				'Exotel' ,modified_by ,i.get("sid"), i.get("recording_url"), 'Phone'), mgs)
+				'Exotel' ,modified_by ,i.get("sid"), i.get("recording_url"), 'Phone', mgs))
 
 				if row.get("Phone Calls Customer Number"):
 					if not len((frappe.get_all("Contact", filters={"mobile_no":row.get("Phone Calls Customer Number")}))):
