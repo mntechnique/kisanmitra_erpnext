@@ -157,6 +157,10 @@ def issue_inner():
 			name =str(str(name_prifix) + name_suffix)
 			creation = frappe.utils.get_datetime_str(datetime.strptime(i.get("creation"), "%Y-%m-%d %I:%M %p"))
 			modified = frappe.utils.get_datetime_str(datetime.strptime(i.get("modified"), "%Y-%m-%d %I:%M %p"))
+			owner_by_name = i.get("owner")
+			if owner_by_name == "Visheshwar Rao":
+				owner_by_name = "Vishesh rao Urvetha"
+			owner = (frappe.get_all("User" , filters = {"full_name":owner_by_name})[0]).get("name")	
 			modified_by_name = i.get("modified_by")
 			if modified_by_name == "Visheshwar Rao":
 				modified_by_name = "Vishesh rao Urvetha"
@@ -234,7 +238,7 @@ def issue_inner():
 			km_state_case, km_call_type, km_priority, km_department) values
 			(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
 			(i.get("subject"), i.get("description"), creation, name, modified,
-			modified_by, i.get("resolution_details"), modified_by, i.get("km_resolution_type"),
+			owner, i.get("resolution_details"), modified_by, i.get("km_resolution_type"),
 			i.get("km_caller_name"), str(km_are_you_calling_for_yourself), i.get("km_caller_relationship_with_farmer"),
 			mandal, village, i.get("km_caste_category"), i.get("km_caste"),
 			contact, i.get("km_other_caste"), i.get("km_case_category"),district, i.get("km_relation"), 
@@ -330,12 +334,13 @@ def phone_call_inner():
 
 		frappe.msgprint("importing phone_call started",alert=True)		
 		for i in phone_call_list:
-			if i.get("modified_by"):
+			if i.get("modified_by") and i.get("km_calls_start_time"):
 				reference_name=''
 				reference_doctype = ''
 				km_calls_start_time = ''
 				km_calls_end_time = ''
 				status = 'Open'
+				mgs = ''
 				if i.get("case_number"):
 					name_prifix = 'VKB-' if str(i.get("case_number"))[0]=='V' or str(i.get("case_number"))[0]=='v' else 'KM-'
 					name_suffix = str(map(int,re.findall('\d+', str(i.get("case_number"))))[0])
@@ -347,10 +352,11 @@ def phone_call_inner():
 				name = frappe.generate_hash(length=10)
 				creation = frappe.utils.get_datetime_str(datetime.strptime(i.get("creation"), "%Y-%m-%d %I:%M %p"))
 				modified = frappe.utils.get_datetime_str(datetime.strptime(i.get("modified"), "%Y-%m-%d %I:%M %p"))
-				if i.get("km_calls_start_time"):
-					km_calls_start_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_start_time"), "%Y-%m-%d %I:%M %p"))
+				km_calls_start_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_start_time"), "%Y-%m-%d %I:%M %p"))
 				if i.get("km_calls_end_time"):
 					km_calls_end_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_end_time"), "%Y-%m-%d %I:%M %p"))
+				elif not i.get("km_calls_end_time") and i.get("km_call_duration") == 0:
+					km_calls_end_time = frappe.utils.get_datetime_str(datetime.strptime(i.get("km_calls_start_time"), "%Y-%m-%d %I:%M %p"))
 				modified_by_name = i.get("reference_owner")
 				if modified_by_name == "Visheshwar Rao":
 					modified_by_name = "Vishesh rao Urvetha"
@@ -358,19 +364,27 @@ def phone_call_inner():
 				sender_full_name = modified_by_name
 				if i.get("sent_or_received") == "inbound":
 					sent_or_received = "Received"
+					if i.get("km_call_customer"):
+						mgs = "I received a call from "+i.get("phone_no")+"("+i.get("km_call_customer")+") and spoke for "+i.get("km_call_duration")+" sec"
+					else :
+						mgs = "I received a call from "+i.get("phone_no")+" and spoke for "+i.get("km_call_duration")+" sec"
 				else :
 					sent_or_received = "Sent"	
+					if i.get("km_call_customer"):
+						mgs = "I call to "+i.get("phone_no")+"("+i.get("km_call_customer")+") and spoke for "+i.get("km_call_duration")+" sec"
+					else :
+						mgs = "I call to "+i.get("phone_no")+" and spoke for "+i.get("km_call_duration")+" sec"	
 
 				frappe.db.sql("""insert into `tabCommunication`
 				(comment_type, communication_type, reference_owner, subject, reference_doctype, reference_name, 
 				communication_date, user, creation, modified, modified_by, name , status, sender_full_name , sent_or_received , 
 				km_call_status , km_call_customer , phone_no , km_calls_start_time , km_calls_end_time , km_call_duration , 
-				km_call_gateway , owner, sid, recording_url, communication_medium) values 
-				('Info', 'Communication', %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+				km_call_gateway , owner, sid, recording_url, communication_medium, content) values 
+				('Info', 'Communication', %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
 				(modified_by ,i.get("subject") ,reference_doctype ,reference_name ,creation ,modified_by, creation, modified, 
 				modified_by, name ,status ,sender_full_name ,sent_or_received ,i.get("km_call_status") ,i.get("km_call_customer") ,
 				i.get("phone_no") ,km_calls_start_time ,km_calls_end_time ,i.get("km_call_duration") ,
-				'Exotel' ,modified_by ,i.get("sid"), i.get("recording_url"), 'Phone'))
+				'Exotel' ,modified_by ,i.get("sid"), i.get("recording_url"), 'Phone', mgs))
 
 				if row.get("Phone Calls Customer Number"):
 					if not len((frappe.get_all("Contact", filters={"mobile_no":row.get("Phone Calls Customer Number")}))):
@@ -508,12 +522,3 @@ def get_job_queue(job_name):
 def is_queue_running(job_name):
 	queue = get_job_queue(job_name)
 	return queue and len(queue) > 0 and queue[0].get("status") in ["started", "queued"]
-
-
-def test():
-	new_list = []
-	with open('/home/deepak/Desktop/km_data_import/30-4-2018/km_issue.csv') as kmdata:
-   		reader = csv.DictReader(kmdata)
-   		for row in reader:
-   			new_list.append(row.get("Department"))
-   	return new_list		
