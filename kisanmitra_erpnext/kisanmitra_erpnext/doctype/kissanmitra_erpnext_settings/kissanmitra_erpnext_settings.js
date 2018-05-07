@@ -19,7 +19,6 @@ function import_lead(frm) {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.lead_outer",
 		}).done((r) => {
-			frappe.msgprint(__("Import Lead Completed"));
 		}).fail((r)=>{
 			console.log(r);
 		});
@@ -32,7 +31,6 @@ function import_issue(frm) {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.issue_outer",
 		}).done((r) => {
-			frappe.msgprint(__("Import Issue Completed"));
 		}).fail((r)=>{
 			console.log(r);
 		});
@@ -45,7 +43,6 @@ function import_comments(frm) {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.comment_outer",
 		}).done((r) => {
-			frappe.msgprint(__("Import Comments Completed"));
 		}).fail((r)=>{
 			console.log(r);
 		});
@@ -58,7 +55,6 @@ function import_phone_call(frm) {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.phone_call_outer",
 		}).done((r) => {
-			frappe.msgprint(__("Import Phone Calls Completed"));
 		}).fail((r)=>{
 			console.log(r);
 		});
@@ -71,7 +67,6 @@ function import_vikarabad(frm) {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.vikarabad_outer",
 		}).done((r) => {
-			frappe.msgprint(__("Import Vikarabad Completed"));
 		}).fail((r)=>{
 			console.log(r);
 		});
@@ -84,7 +79,6 @@ function import_adilabad(frm) {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.adilabad_outer",
 		}).done((r) => {
-			frappe.msgprint(__("Import Adilabad Completed"));
 		}).fail((r)=>{
 			console.log(r);
 		});
