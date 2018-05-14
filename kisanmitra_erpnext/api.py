@@ -175,6 +175,7 @@ def issue_inner():
 				lead = (frappe.get_all("Lead", filters={"company_name":i.get("farmer_name")}))[0].get("name")
 			if lead:
 				contact = frappe.db.get_value("Dynamic Link",{"link_name":lead},"parent")
+				raised_by_phone = frappe.db.get_value("Contact",contact,"mobile_no")
 			state = str(i.get("km_state_case"))
 			district = str(i.get("km_district_case"))
 	 		mandal = str(i.get("km_mandal_case"))
@@ -235,17 +236,17 @@ def issue_inner():
 			(subject, description, creation, name, modified, owner, resolution_details, modified_by,
 			km_resolution_type, km_caller_name, km_are_you_calling_for_yourself, km_caller_relationship_with_farmer,
 			km_mandal_case, km_village_case, km_caste_category, km_caste, contact, km_other_caste, km_case_category,
-			km_district_case, km_relation, km_relation_name, raised_by, lead, 
-			km_state_case, km_call_type, km_priority, km_department, status, company, communication_medium) values
+			km_district_case, km_relation, km_relation_name, lead, 
+			km_state_case, km_call_type, km_priority, km_department, status, company, communication_medium, raised_by_phone) values
 			(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
 			(i.get("subject"), i.get("description"), creation, name, modified,
 			owner, i.get("resolution_details"), modified_by, i.get("km_resolution_type"),
 			i.get("km_caller_name"), str(km_are_you_calling_for_yourself), i.get("km_caller_relationship_with_farmer"),
 			mandal, village, i.get("km_caste_category"), i.get("km_caste"),
 			contact, i.get("km_other_caste"), i.get("km_case_category"),district, i.get("km_relation"), 
-			i.get("km_relation_name"), modified_by, lead, 
+			i.get("km_relation_name"), lead, 
 			state, i.get("km_call_type"), i.get("km_priority"), i.get("km_department"), i.get("km_status"), "KisanMitra",
-			"Phone"))
+			"Phone", raised_by_phone))
 		frappe.db.commit()
 		frappe.msgprint("importing issue completed")		
 	except Exception as e:
