@@ -149,7 +149,11 @@ fixtures = [
 									"Issue-km_call_type",
 									"Issue-km_priority",
 									"Issue-km_relation_name",
-									"Issue-km_department"]]]
+									"Issue-km_department",
+									"Issue-km_sb_issue_category_department",
+									"Issue-km_issue_category", 
+									"Issue-km_cb_issue_category_department",
+									"Issue-km_issue_department"]]]
 	}, 
 	{
 		"dt":"Property Setter",
