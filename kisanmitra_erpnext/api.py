@@ -1,5 +1,5 @@
 import frappe
-from frappe import _
+from frappe import _, msgprint
 import os
 import csv
 import re
@@ -236,15 +236,16 @@ def issue_inner():
 			km_resolution_type, km_caller_name, km_are_you_calling_for_yourself, km_caller_relationship_with_farmer,
 			km_mandal_case, km_village_case, km_caste_category, km_caste, contact, km_other_caste, km_case_category,
 			km_district_case, km_relation, km_relation_name, raised_by, lead, 
-			km_state_case, km_call_type, km_priority, km_department, status) values
-			(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+			km_state_case, km_call_type, km_priority, km_department, status, company, communication_medium) values
+			(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
 			(i.get("subject"), i.get("description"), creation, name, modified,
 			owner, i.get("resolution_details"), modified_by, i.get("km_resolution_type"),
 			i.get("km_caller_name"), str(km_are_you_calling_for_yourself), i.get("km_caller_relationship_with_farmer"),
 			mandal, village, i.get("km_caste_category"), i.get("km_caste"),
 			contact, i.get("km_other_caste"), i.get("km_case_category"),district, i.get("km_relation"), 
 			i.get("km_relation_name"), modified_by, lead, 
-			state, i.get("km_call_type"), i.get("km_priority"), i.get("km_department"), i.get("km_status")))
+			state, i.get("km_call_type"), i.get("km_priority"), i.get("km_department"), i.get("km_status"), "KisanMitra",
+			"Phone"))
 		frappe.db.commit()
 		frappe.msgprint("importing issue completed")		
 	except Exception as e:
@@ -465,8 +466,6 @@ def vikarabad_inner():
 		frappe.db.rollback()
     	frappe.log_error(message=frappe.get_traceback(), title="Error in vikarabad import")	
 
-
-
 def adilabad_inner():
 	adilabad_list=[]
 	adilabad_village_list=[]
@@ -513,6 +512,45 @@ def adilabad_inner():
 	except Exception as e:
 		frappe.db.rollback()
     	frappe.log_error(message=frappe.get_traceback(), title="Error in adilabad import")	
+
+@frappe.whitelist()
+def delete_data():
+	delete_all_data =(frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").delete_data_for).split(",")
+	for delete in delete_data:
+		if delete == "Contact":
+			data = frappe.get_all("Contact")
+			frappe.msgprint("Contacts Deletion started")
+			for i in data:
+				frappe.delete_doc("Contact",i.name)
+			frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Contact'""")	
+			frappe.db.commit()
+			frappe.msgprint("All Contacts Deleted")
+		elif delete == "Lead":
+			data = frappe.get_all("Lead")
+			frappe.msgprint("Leads Deletion started")
+			for i in data:
+				frappe.delete_doc("Lead",i.name)
+			frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Lead'""")	
+			frappe.db.commit()
+			frappe.msgprint("All Leads Deleted")
+		elif delete == "Issue":
+			data = frappe.get_all("Issue")
+			frappe.msgprint("Issues Deletion started")
+			for i in data:
+				frappe.delete_doc("Issue",i.name)
+			frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Issue'""")
+			frappe.db.commit()
+			frappe.msgprint("All Issues Deleted")
+		elif delete == "Comments":
+			frappe.msgprint("Comments Deletion started")
+			frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Issue' and comment_type='Comment'""")
+			frappe.db.commit()
+			frappe.msgprint("All Comments Deleted")
+		elif delete == "Phone-call":
+			frappe.msgprint("Phone Calls Deletion started")
+			frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Issue' and communication_medium='Phone'""")
+			frappe.db.commit()
+			frappe.msgprint("All Phone Calls Deleted")
 
 
 def get_job_queue(job_name):

@@ -9,7 +9,12 @@ frappe.ui.form.on('KissanMitra ERPNext Settings', {
 		import_phone_call(frm);
 		import_vikarabad(frm);
 		import_adilabad(frm);
+		delete_data(frm);
 
+	},
+
+	delete_data_for: function(frm) {
+		frm.save();
 	}
 });
 
@@ -78,6 +83,18 @@ function import_adilabad(frm) {
 	wrapper.find(".btn-import-adilabad").on("click", function() {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.adilabad_outer",
+		}).done((r) => {
+		}).fail((r)=>{
+			console.log(r);
+		});
+	})
+}
+
+function delete_data(frm) {
+	var wrapper = $(frm.fields_dict["delete"].wrapper);
+	wrapper.find(".btn-delete").on("click", function() {
+		frappe.call({
+			method: "kisanmitra_erpnext.api.delete_data",
 		}).done((r) => {
 		}).fail((r)=>{
 			console.log(r);
