@@ -516,7 +516,7 @@ def adilabad_inner():
 @frappe.whitelist()
 def delete_data():
 	delete_all_data =(frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").delete_data_for).split(",")
-	for delete in delete_data:
+	for delete in delete_all_data:
 		if delete == "Contact":
 			data = frappe.get_all("Contact")
 			frappe.msgprint("Contacts Deletion started")
