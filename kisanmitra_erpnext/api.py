@@ -105,7 +105,7 @@ def lead_inner():
 					})
 				new_contact.save()
 		frappe.db.commit() 
-		frappe.msgprint("importing lead completed")
+		frappe.log_error(message=str("importing lead completed"), title="importing lead completed")
 	except Exception as e:
 		frappe.db.rollback()
     	frappe.log_error(message=frappe.get_traceback(), title="Error in lead import")	
@@ -248,7 +248,7 @@ def issue_inner():
 			state, i.get("km_call_type"), i.get("km_priority"), i.get("km_department"), i.get("km_status"), "KisanMitra",
 			"Phone", raised_by_phone))
 		frappe.db.commit()
-		frappe.msgprint("importing issue completed")		
+		frappe.log_error(message=str("importing issue completed"), title="importing issue completed")		
 	except Exception as e:
 		frappe.db.rollback()
     	frappe.log_error(message=frappe.get_traceback(), title="Error in issue import")
@@ -300,8 +300,8 @@ def comment_inner():
 			('Comment','Comment',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
 			(i.get("content"),modified_by, i.get("subject"), reference_doctype, reference_name, creation,
 			modified_by, creation, modified, modified_by, name ,status, sender_full_name, 'Sent'))
-		frappe.db.commit()	
-		frappe.msgprint("importing comments completed")	
+		frappe.db.commit()
+		frappe.log_error(message=str("importing comments completed"), title="importing comments completed")
 	except Exception as e:
 		frappe.db.rollback()
     	frappe.log_error(message=frappe.get_traceback(), title="Error in comments import")	
@@ -408,7 +408,8 @@ def phone_call_inner():
 								m.contact = new_contact.name
 								m.save()
 		frappe.db.commit()
-		frappe.msgprint("importing phone_call completed")	
+		frappe.msgprint("importing phone_call completed")
+		frappe.log_error(message=str("importing phone_call completed"), title="importing phone_call completed")	
 	except Exception as e:
 		frappe.db.rollback()
     	frappe.log_error(message=frappe.get_traceback(), title="Error in phone_call import")		
