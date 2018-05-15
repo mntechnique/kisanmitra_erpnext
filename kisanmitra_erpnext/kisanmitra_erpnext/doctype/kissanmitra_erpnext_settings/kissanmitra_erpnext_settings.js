@@ -24,6 +24,7 @@ function import_lead(frm) {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.lead_outer",
 		}).done((r) => {
+			frappe.msgprint("Check the error log");
 		}).fail((r)=>{
 			console.log(r);
 		});
@@ -36,6 +37,7 @@ function import_issue(frm) {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.issue_outer",
 		}).done((r) => {
+			frappe.msgprint("Check the error log");
 		}).fail((r)=>{
 			console.log(r);
 		});
@@ -48,6 +50,7 @@ function import_comments(frm) {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.comment_outer",
 		}).done((r) => {
+			frappe.msgprint("Check the error log");
 		}).fail((r)=>{
 			console.log(r);
 		});
@@ -60,6 +63,7 @@ function import_phone_call(frm) {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.phone_call_outer",
 		}).done((r) => {
+			frappe.msgprint("Check the error log");
 		}).fail((r)=>{
 			console.log(r);
 		});
@@ -72,6 +76,7 @@ function import_vikarabad(frm) {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.vikarabad_outer",
 		}).done((r) => {
+			frappe.msgprint("Check the error log");
 		}).fail((r)=>{
 			console.log(r);
 		});
@@ -84,6 +89,7 @@ function import_adilabad(frm) {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.adilabad_outer",
 		}).done((r) => {
+			frappe.msgprint("Check the error log");
 		}).fail((r)=>{
 			console.log(r);
 		});
@@ -96,6 +102,7 @@ function delete_data(frm) {
 		frappe.call({
 			method: "kisanmitra_erpnext.api.delete_data",
 		}).done((r) => {
+			frappe.msgprint("Check the error log");
 		}).fail((r)=>{
 			console.log(r);
 		});
