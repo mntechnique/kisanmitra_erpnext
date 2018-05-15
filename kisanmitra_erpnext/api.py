@@ -516,42 +516,37 @@ def adilabad_inner():
 
 @frappe.whitelist()
 def delete_data():
-	delete_all_data =(frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").delete_data_for).split(",")
-	for delete in delete_all_data:
-		if delete == "Contact":
-			data = frappe.get_all("Contact")
-			frappe.msgprint("Contacts Deletion started")
-			for i in data:
-				frappe.delete_doc("Contact",i.name)
-			frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Contact'""")	
-			frappe.db.commit()
-			frappe.msgprint("All Contacts Deleted")
-		elif delete == "Lead":
-			data = frappe.get_all("Lead")
-			frappe.msgprint("Leads Deletion started")
-			for i in data:
-				frappe.delete_doc("Lead",i.name)
-			frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Lead'""")	
-			frappe.db.commit()
-			frappe.msgprint("All Leads Deleted")
-		elif delete == "Issue":
-			data = frappe.get_all("Issue")
-			frappe.msgprint("Issues Deletion started")
-			for i in data:
-				frappe.delete_doc("Issue",i.name)
-			frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Issue'""")
-			frappe.db.commit()
-			frappe.msgprint("All Issues Deleted")
-		elif delete == "Comments":
-			frappe.msgprint("Comments Deletion started")
-			frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Issue' and comment_type='Comment'""")
-			frappe.db.commit()
-			frappe.msgprint("All Comments Deleted")
-		elif delete == "Phone-call":
-			frappe.msgprint("Phone Calls Deletion started")
-			frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Issue' and communication_medium='Phone'""")
-			frappe.db.commit()
-			frappe.msgprint("All Phone Calls Deleted")
+	try:
+		delete_all_data =(frappe.get_doc("KissanMitra ERPNext Settings","KissanMitra ERPNext Settings").delete_data_for).split(",")
+		for delete in delete_all_data:
+			if delete == "Contact":
+				frappe.db.sql("""delete from `tabContact`""")
+				frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Contact'""")	
+				frappe.db.commit()
+				frappe.log_error(message=str("Contacts Deletion Completed"), title="Contacts Deletion Completed")
+			elif delete == "Lead":
+				frappe.db.sql("""delete from `tabLead`""")
+				frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Lead'""")
+				frappe.db.commit()
+				frappe.log_error(message=str("Leads Deletion Completed"), title="Leads Deletion Completed")
+			elif delete == "Issue":
+				frappe.db.sql("""delete from `tabIssue`""")
+				frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Issue'""")
+				frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Issue' and comment_type='Comment'""")
+				frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Issue' and communication_medium='Phone'""")
+				frappe.db.commit()
+				frappe.log_error(message=str("Issues Deletion Completed"), title="Issues Deletion Completed")
+			elif delete == "Comments":
+				frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Issue' and comment_type='Comment'""")
+				frappe.db.commit()
+				frappe.log_error(message=str("Comments Deletion Completed"), title="Comments Deletion Completed")
+			elif delete == "Phone-call":
+				frappe.db.sql("""delete from `tabCommunication` where reference_doctype='Issue' and communication_medium='Phone'""")
+				frappe.db.commit()
+				frappe.log_error(message=str("Phone-call Deletion Completed"), title="Phone-call Deletion Completed")
+	except Exception as e:
+		frappe.db.rollback()
+    	frappe.log_error(message=frappe.get_traceback(), title="Error in data deletion")	
 
 
 def get_job_queue(job_name):
