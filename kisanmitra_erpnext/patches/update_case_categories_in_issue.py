@@ -13,7 +13,7 @@ def execute():
 	for issue in issues:
 		if issue.km_case_category:
 			case_categories = (issue.km_case_category).split(",")
-			case_categories = [department.strip() for department in departments]
+			case_categories = [case_category.strip() for case_category in case_categories]
 
 			values = []
 			for case_category in case_categories:
