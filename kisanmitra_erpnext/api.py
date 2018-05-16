@@ -169,6 +169,7 @@ def issue_inner():
 			km_are_you_calling_for_yourself = 1 if str(i.get("km_are_you_calling_for_yourself")) == 'yes' else 0
 			lead = ''
 			contact = ''
+			raised_by_phone = ''
 			if len((frappe.get_all("Lead", filters={"company_name":i.get("km_caller_name")}))):
 				lead = (frappe.get_all("Lead", filters={"company_name":i.get("km_caller_name")}))[0].get("name")
 			elif len((frappe.get_all("Lead", filters={"company_name":i.get("farmer_name")}))):

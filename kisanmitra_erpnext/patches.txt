@@ -1,1 +1,3 @@
 kisanmitra_erpnext.patches.update_departments_in_issue
+kisanmitra_erpnext.patches.update_case_categories_in_issue
+kisanmitra_erpnext.patches.update_lead_contact_field
