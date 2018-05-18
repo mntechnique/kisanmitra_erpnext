@@ -63,8 +63,8 @@ def lead_inner():
 	lead_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
 	try:
 		with open(lead_file_path) as kmdata:
-	   		reader = csv.DictReader(kmdata)
-	   		for row in reader:
+			reader = csv.DictReader(kmdata)
+			for row in reader:
 				lead_list.append(row.get("Contacts First Name")+" "+row.get("Contacts Last Name"))
 				dict={"first_name":row.get("Contacts First Name"),
 					  "last_name":row.get("Contacts Last Name"),
@@ -108,7 +108,7 @@ def lead_inner():
 		frappe.log_error(message=str("importing lead completed"), title="importing lead completed")
 	except Exception as e:
 		frappe.db.rollback()
-    	frappe.log_error(message=frappe.get_traceback(), title="Error in lead import")	
+		frappe.log_error(message=frappe.get_traceback(), title="Error in lead import")	
 
 
 def issue_inner():
@@ -117,8 +117,8 @@ def issue_inner():
 	issue_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
 	try:
 		with open(issue_file_path) as kmdata:
-	   		reader = csv.DictReader(kmdata)
-	   		for row in reader:
+			reader = csv.DictReader(kmdata)
+			for row in reader:
 				dict={"subject":row.get("Case Title"),
 					  "description":row.get("Summary"),
 					  "creation":row.get("Created Date"),
@@ -178,9 +178,9 @@ def issue_inner():
 				raised_by_phone = frappe.db.get_value("Contact",contact,"mobile_no")
 			state = str(i.get("km_state_case"))
 			district = str(i.get("km_district_case"))
-	 		mandal = str(i.get("km_mandal_case"))
-	 		village = str(i.get("km_village_case"))
-	 		if mandal == "Vikarabad":
+			mandal = str(i.get("km_mandal_case"))
+			village = str(i.get("km_village_case"))
+			if mandal == "Vikarabad":
 				mandal = "Vikarabad(M)"
 			if village == "Vikarabad":
 				village = "Vikarabad(V)"
@@ -217,7 +217,7 @@ def issue_inner():
 					new_mandal_territory.parent_territory = district
 					new_mandal_territory.territory_name = mandal
 					new_mandal_territory.save()
-	 		
+			
 			if mandal:
 				if frappe.get_all("Territory",filters = {"parent_territory":mandal ,"territory_name":village}):
 					village = village
@@ -251,7 +251,7 @@ def issue_inner():
 		frappe.log_error(message=str("importing issue completed"), title="importing issue completed")		
 	except Exception as e:
 		frappe.db.rollback()
-    	frappe.log_error(message=frappe.get_traceback(), title="Error in issue import")
+		frappe.log_error(message=frappe.get_traceback(), title="Error in issue import")
 
 
 def comment_inner():
@@ -260,14 +260,14 @@ def comment_inner():
 	comment_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
 	try:
 		with open(comment_file_path) as kmdata:
-	   		reader = csv.DictReader(kmdata)
-	   		for row in reader:
-	   			dict={"case_number":row.get("Cases Case Number") ,
-	   				  "content":row.get("Comments Comment"),
-	   				  "reference_owner":row.get("Comments Creator"),
-	   				  "subject":row.get("Comments Related To"),
-	   				  "creation":row.get("Comments Created Time"),
-	   				  "modified":row.get("Comments Modified Time")}
+			reader = csv.DictReader(kmdata)
+			for row in reader:
+				dict={"case_number":row.get("Cases Case Number") ,
+					  "content":row.get("Comments Comment"),
+					  "reference_owner":row.get("Comments Creator"),
+					  "subject":row.get("Comments Related To"),
+					  "creation":row.get("Comments Created Time"),
+					  "modified":row.get("Comments Modified Time")}
 				comment_list.append(dict)
 
 		frappe.msgprint("importing comments started")
@@ -304,7 +304,7 @@ def comment_inner():
 		frappe.log_error(message=str("importing comments completed"), title="importing comments completed")
 	except Exception as e:
 		frappe.db.rollback()
-    	frappe.log_error(message=frappe.get_traceback(), title="Error in comments import")	
+		frappe.log_error(message=frappe.get_traceback(), title="Error in comments import")	
 
 
 
@@ -315,24 +315,24 @@ def phone_call_inner():
 	phone_call_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
 	try:
 		with open(phone_call_file_path) as kmdata:
-	   		reader = csv.DictReader(kmdata)
-	   		for row in reader:
-	   			dict={"case_number":row.get("Cases Case Number") ,
-	   				  "reference_owner":row.get("Phone Calls Created By"),
-	   				  "subject":row.get("Phone Calls Cases"),
-	   				  "creation":row.get("Phone Calls Created Time"),
-	   				  "modified":row.get("Phone Calls Modified Time"),
-	   				  "modified_by":row.get("Phone Calls Last Modified By"),
-	   				  "sent_or_received":row.get("Phone Calls Direction"),
-	   				  "km_call_status":row.get("Phone Calls Call Status"),
-	   				  "km_call_customer":row.get("Phone Calls Customer"),
-	   				  "phone_no":row.get("Phone Calls Customer Number"),
-	   				  "km_calls_start_time":row.get("Phone Calls Start Time"),
-	   				  "km_calls_end_time":row.get("Phone Calls End Time"),
-	   				  "recording_url":row.get("Phone Calls Recording"),
+			reader = csv.DictReader(kmdata)
+			for row in reader:
+				dict={"case_number":row.get("Cases Case Number") ,
+					  "reference_owner":row.get("Phone Calls Created By"),
+					  "subject":row.get("Phone Calls Cases"),
+					  "creation":row.get("Phone Calls Created Time"),
+					  "modified":row.get("Phone Calls Modified Time"),
+					  "modified_by":row.get("Phone Calls Last Modified By"),
+					  "sent_or_received":row.get("Phone Calls Direction"),
+					  "km_call_status":row.get("Phone Calls Call Status"),
+					  "km_call_customer":row.get("Phone Calls Customer"),
+					  "phone_no":row.get("Phone Calls Customer Number"),
+					  "km_calls_start_time":row.get("Phone Calls Start Time"),
+					  "km_calls_end_time":row.get("Phone Calls End Time"),
+					  "recording_url":row.get("Phone Calls Recording"),
 					  "sid":row.get("Phone Calls Source UUID"),
-	   				  "km_call_duration":row.get("Phone Calls Duration (sec)"),
-	   				  "km_call_gateway":row.get("Phone Calls Gateway")}
+					  "km_call_duration":row.get("Phone Calls Duration (sec)"),
+					  "km_call_gateway":row.get("Phone Calls Gateway")}
 				phone_call_list.append(dict)
 
 		frappe.msgprint("importing phone_call started")		
@@ -412,7 +412,7 @@ def phone_call_inner():
 		frappe.log_error(message=str("importing phone_call completed"), title="importing phone_call completed")	
 	except Exception as e:
 		frappe.db.rollback()
-    	frappe.log_error(message=frappe.get_traceback(), title="Error in phone_call import")		
+		frappe.log_error(message=frappe.get_traceback(), title="Error in phone_call import")		
 
 
 
@@ -424,16 +424,16 @@ def vikarabad_inner():
 	vikarabad_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
 	try:
 		with open(vikarabad_file_path) as kmdata:
-	   		reader = csv.DictReader(kmdata)
-	   		for row in reader:
-	   			dict = {"mandal":row.get("mandal"),"Village":row.get("Village")}
-	   			vikarabad_village_list.append(row.get("Village"))
-	   			vikarabad_list.append(dict)	
-	   		unique_village_list = list(set(vikarabad_village_list))
-	   		for i in unique_village_list:
-	   			m = [ j for j in vikarabad_village_list if j == i]
-	   			if len(m) > 1:
-	   				duplicate_village_list.append(m[0])		
+			reader = csv.DictReader(kmdata)
+			for row in reader:
+				dict = {"mandal":row.get("mandal"),"Village":row.get("Village")}
+				vikarabad_village_list.append(row.get("Village"))
+				vikarabad_list.append(dict)	
+			unique_village_list = list(set(vikarabad_village_list))
+			for i in unique_village_list:
+				m = [ j for j in vikarabad_village_list if j == i]
+				if len(m) > 1:
+					duplicate_village_list.append(m[0])		
 		frappe.msgprint("importing started")
 		for vkb in vikarabad_list:	
 			mandal = str(vkb.get("mandal"))
@@ -466,7 +466,7 @@ def vikarabad_inner():
 		frappe.msgprint("importing completed")
 	except Exception as e:
 		frappe.db.rollback()
-    	frappe.log_error(message=frappe.get_traceback(), title="Error in vikarabad import")	
+		frappe.log_error(message=frappe.get_traceback(), title="Error in vikarabad import")	
 
 def adilabad_inner():
 	adilabad_list=[]
@@ -477,16 +477,16 @@ def adilabad_inner():
 	adilabad_file_path = os.path.join(frappe.get_site_path(), "public","files", file_name)
 	try:
 		with open(adilabad_file_path) as kmdata:
-	   		reader = csv.DictReader(kmdata)
-	   		for row in reader:
-	   			dict = {"Mandal":row.get("Mandal"),"Village":row.get("Village")}
-	   			adilabad_village_list.append(row.get("Village"))	
-	   			adilabad_list.append(dict)
-	   		unique_village_list = list(set(adilabad_village_list))
-	   		for i in unique_village_list:
-	   			m = [ j for j in adilabad_village_list if j == i]
-	   			if len(m) > 1:
-	   				duplicate_village_list.append(m[0])
+			reader = csv.DictReader(kmdata)
+			for row in reader:
+				dict = {"Mandal":row.get("Mandal"),"Village":row.get("Village")}
+				adilabad_village_list.append(row.get("Village"))	
+				adilabad_list.append(dict)
+			unique_village_list = list(set(adilabad_village_list))
+			for i in unique_village_list:
+				m = [ j for j in adilabad_village_list if j == i]
+				if len(m) > 1:
+					duplicate_village_list.append(m[0])
 		frappe.msgprint("importing started")
 		for albd in adilabad_list:	
 			mandal = str(albd.get("Mandal"))
@@ -513,7 +513,7 @@ def adilabad_inner():
 		frappe.msgprint("importing completed")
 	except Exception as e:
 		frappe.db.rollback()
-    	frappe.log_error(message=frappe.get_traceback(), title="Error in adilabad import")	
+		frappe.log_error(message=frappe.get_traceback(), title="Error in adilabad import")	
 
 @frappe.whitelist()
 def delete_data():
@@ -547,7 +547,7 @@ def delete_data():
 				frappe.log_error(message=str("Phone-call Deletion Completed"), title="Phone-call Deletion Completed")
 	except Exception as e:
 		frappe.db.rollback()
-    	frappe.log_error(message=frappe.get_traceback(), title="Error in data deletion")	
+		frappe.log_error(message=frappe.get_traceback(), title="Error in data deletion")	
 
 
 def get_job_queue(job_name):
@@ -558,3 +558,28 @@ def get_job_queue(job_name):
 def is_queue_running(job_name):
 	queue = get_job_queue(job_name)
 	return queue and len(queue) > 0 and queue[0].get("status") in ["started", "queued"]
+
+@frappe.whitelist()
+def update_communication():
+	import requests
+
+	try:
+		credentials = frappe.get_doc("Exotel Settings")
+		calls = frappe.get_all("Communication", fields=["*"], filters={})
+		for call in calls:
+			if not call.get("km_calls_end_date"):
+				response = requests.get('https://{exotel_sid}:{exotel_token}@api.exotel.com/v1/Accounts/{exotel_sid}/Calls/{call_sid}.json'.format(exotel_sid = credentials.exotel_sid,exotel_token = credentials.exotel_token,call_sid = content.get("CallSid")))
+				comm = frappe.get_doc("Communication",call.get("name"))
+
+				if response.status_code == 200:
+					ed = response.json()["Call"]
+					comm.km_call_status = ed.get("Status")
+					comm.km_call_duration = ed.get("Duration")
+					comm.km_calls_start_time = ed.get("StartTime")
+					comm.km_calls_end_time = ed.get("EndTime")
+					comm.save()
+					frappe.db.commit()
+	except Exception as e:
+		frappe.log_error(message=frappe.get_traceback(), title="Error in updating communication")
+					
+
