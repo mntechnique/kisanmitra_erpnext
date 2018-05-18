@@ -90,23 +90,23 @@ app_license = "MIT"
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
+scheduler_events = {
 # 	"all": [
 # 		"kisanmitra_erpnext.tasks.all"
 # 	],
 # 	"daily": [
 # 		"kisanmitra_erpnext.tasks.daily"
 # 	],
-# 	"hourly": [
-# 		"kisanmitra_erpnext.tasks.hourly"
-# 	],
+	"hourly": [
+		"kisanmitra_erpnext.api.update_communication"
+	]
 # 	"weekly": [
 # 		"kisanmitra_erpnext.tasks.weekly"
 # 	]
 # 	"monthly": [
 # 		"kisanmitra_erpnext.tasks.monthly"
 # 	]
-# }
+}
 
 # Testing
 # -------
