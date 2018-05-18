@@ -569,7 +569,7 @@ def update_communication():
 		calls = frappe.get_all("Communication", fields=["*"], filters={})
 		for call in calls:
 			if not call.get("km_calls_end_date"):
-				response = requests.get('https://{exotel_sid}:{exotel_token}@api.exotel.com/v1/Accounts/{exotel_sid}/Calls/{call_sid}.json'.format(exotel_sid = credentials.exotel_sid,exotel_token = credentials.exotel_token,call_sid = content.get("CallSid")))
+				response = requests.get('https://{exotel_sid}:{exotel_token}@api.exotel.com/v1/Accounts/{exotel_sid}/Calls/{call_sid}.json'.format(exotel_sid = credentials.exotel_sid,exotel_token = credentials.exotel_token,call_sid = call.get("sid")))
 				comm = frappe.get_doc("Communication",call.get("name"))
 
 				if response.status_code == 200:
