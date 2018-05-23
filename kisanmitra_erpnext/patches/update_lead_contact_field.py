@@ -9,10 +9,14 @@ def execute():
 		lead = ''
 		contact = ''
 		raised_by_phone = ''
-		caller_name = issue.km_caller_name
+		caller_name = issue.get("km_caller_name")
 		if caller_name:
+			caller = caller_name
 			caller_name = (caller_name.split("."))[0].strip()+" 0"
-			lead = (frappe.get_all("Lead", filters={"company_name":caller_name}))[0].get("name")
+			lead = (frappe.get_all("Lead", filters={"company_name":caller_name}))[0].get("name") if\
+				len((frappe.get_all("Lead", filters={"company_name":caller_name})))>0 else\
+				(frappe.get_all("Lead", filters={"company_name":caller}))[0].get("name")
+
 			contact = frappe.db.get_value("Dynamic Link",{"link_name":lead},"parent")
 			raised_by_phone = frappe.db.get_value("Contact",contact,"mobile_no")
 			if lead and contact and raised_by_phone:

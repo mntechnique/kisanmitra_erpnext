@@ -97,9 +97,9 @@ scheduler_events = {
 # 	"daily": [
 # 		"kisanmitra_erpnext.tasks.daily"
 # 	],
-	"hourly": [
-		"kisanmitra_erpnext.api.update_communication"
-	]
+	# "hourly": [
+	# 	"kisanmitra_erpnext.api.update_communication"
+	# ]
 # 	"weekly": [
 # 		"kisanmitra_erpnext.tasks.weekly"
 # 	]
