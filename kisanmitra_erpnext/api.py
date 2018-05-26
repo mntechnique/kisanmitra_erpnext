@@ -566,7 +566,7 @@ def update_communication():
 
 	try:
 		credentials = frappe.get_doc("Exotel Settings")
-		calls = frappe.get_all("Communication", fields=["*"], filters={}, order_by='creation asc')
+		calls = frappe.get_all("Communication", fields=["*"], filters={"comment_type":"Info"}, order_by='creation asc')
 		for call in calls:
 			if not call.get("km_calls_end_time"):
 				response = requests.get('https://{exotel_sid}:{exotel_token}@api.exotel.com/v1/Accounts/{exotel_sid}/Calls/{call_sid}.json'.format(exotel_sid = credentials.exotel_sid,exotel_token = credentials.exotel_token,call_sid = call.get("sid")))
