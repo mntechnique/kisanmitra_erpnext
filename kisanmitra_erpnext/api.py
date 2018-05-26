@@ -566,21 +566,20 @@ def update_communication():
 
 	try:
 		credentials = frappe.get_doc("Exotel Settings")
-		calls = frappe.get_all("Communication", fields=["*"], filters={}, order_by='creation asc')
+		calls = frappe.get_all("Communication", fields=["*"], filters={"comment_type":"Info"}, order_by='creation asc')
 		for call in calls:
-			if not call.get("km_calls_end_date"):
+			if not call.get("km_calls_end_time"):
 				response = requests.get('https://{exotel_sid}:{exotel_token}@api.exotel.com/v1/Accounts/{exotel_sid}/Calls/{call_sid}.json'.format(exotel_sid = credentials.exotel_sid,exotel_token = credentials.exotel_token,call_sid = call.get("sid")))
-				comm = frappe.get_doc("Communication",call.get("name"))
-
 				if response.status_code == 200:
 					ed = response.json()["Call"]
-					comm.km_call_status = ed.get("Status")
-					comm.km_call_duration = ed.get("Duration")
-					comm.km_calls_start_time = ed.get("StartTime")
-					comm.km_calls_end_time = ed.get("EndTime")
-					comm.save()
-					frappe.db.commit()
+					frappe.db.sql("""update `tabCommunication`
+						set km_call_status=%s, km_call_duration=%s,
+						km_calls_start_time=%s, km_calls_end_time=%s where name=%s""",
+						(ed.get("Status"),ed.get("Duration"),ed.get("StartTime"),
+						ed.get("EndTime"),call.get("name")))
+		frappe.db.commit()
 	except Exception as e:
+		frappe.db.rollback()
 		frappe.log_error(message=frappe.get_traceback(), title="Error in updating communication")
 					
 
