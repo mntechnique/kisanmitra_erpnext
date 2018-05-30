@@ -4,6 +4,8 @@ import os
 import csv
 import re
 from datetime import datetime
+from frappe.utils.pdf import get_pdf
+from frappe.utils.print_format import report_to_pdf
 from frappe.model.naming import make_autoname
 from frappe.core.page.background_jobs.background_jobs import get_info
 
@@ -581,5 +583,3 @@ def update_communication():
 	except Exception as e:
 		frappe.db.rollback()
 		frappe.log_error(message=frappe.get_traceback(), title="Error in updating communication")
-					
-

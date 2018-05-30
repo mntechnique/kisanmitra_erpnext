@@ -1,0 +1,36 @@
+<table class="table">
+    <thead> 
+        <tr> 
+            <th>Case No</th>             
+            <th>Department</th>
+            <th>Mandal</th>
+            <th>Village</th>
+            <th>Caller Name</th>
+            <th>Mobile No.</th>
+            <th>Caste</th>
+            <th>Created Date</th>
+            <th>Issue in Brief</th>
+            <th>Cases Summary</th>
+            <th>Updates</th>
+            <th>Notes</th>
+        </tr>         
+    </thead>     
+    <tbody> 
+    {% for(var i=0; i <= collector_review_report.length-1; i++) { %}
+        <tr> 
+            <td>{{collector_review_report[i].case_no}}</td>             
+            <td>{{collector_review_report[i].department}}</td>
+            <td>{{collector_review_report[i].mandal}}</td> 
+            <td>{{collector_review_report[i].village}}</td>
+            <td>{{collector_review_report[i].caller_name}}</td>
+            <td>{{collector_review_report[i].mobile_no}}</td>
+            <td>{{collector_review_report[i].caste}}</td>
+            <td>{{collector_review_report[i].created_date}}</td>
+            <td>{{collector_review_report[i].issue_in_brief}}</td>
+            <td>{{collector_review_report[i].cases_summary}}</td>
+            <td>{{collector_review_report[i].updates}}</td>
+            <td>{{collector_review_report[i].notes}}</td>
+        </tr>
+        {%}%}     
+    </tbody>
+</table>

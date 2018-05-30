@@ -13,18 +13,16 @@ def execute(filters=None):
 
 def get_columns():
 	columns = [
-		_("Case No") + ":Link/Issue:80",
-		_("Department") + ":HTML:80",
-		_("Mandal") + "::80",
-		_("Village") + "::80",
-		_("Caller Name") + "::80",
-		_("Mobile No.") + "::80",
-		_("Caste") + ":Data:80",
-		_("Created Date") + "::80",
-		_("Issue in Brief") + "::80",
-		_("Cases Summary") + "::80",
-		_("Updates") + ":HTML:80",
-		_("Notes") + "::80",
+		_("Case No") + ":Link/Issue:100",
+		_("Department") + ":HTML:100",
+		_("Mandal/Village") + ":HTML:100",
+		_("Caller Name/Mobile No.") + ":HTML:100",
+		_("Caste Catogery") + ":Data:100",
+		_("Created Date") + "::100",
+		_("Issue in Brief") + "::200",
+		_("Cases Summary") + ":HTML:400",
+		_("Updates") + ":HTML:400",
+		_("Notes") + "::100",
 	]	
 	return columns
 
@@ -34,21 +32,22 @@ def get_data(filters):
 		select name, km_department, km_mandal_case, 
 		km_village_case, km_caller_name, 
 		raised_by_phone, km_caste, 
-		date(creation) as creation_date, km_case_category, 
+		creation as creation_date, km_case_category, 
 		description from `tabIssue` where docstatus = 0 %s """% conditions, as_dict=1)
 	data = [] 
 	for issue in issues:
 		update = ""
 		department = ""
 		case_category = ""
+		mandal_village = ""
+		note = ""
 		comments = frappe.db.sql("""
-			select content from `tabCommunication` 
-			where comment_type='Comment' and reference_name=%s order by creation """,
+			select content, date(creation) as creation_date from `tabCommunication` 
+			where comment_type='Comment' and reference_name=%s order by creation desc""",
 			issue.get("name"), as_dict=1)
 		if comments:
 			for comment in comments:
-				update += comment.get("content")+"<br>"	
-		
+				update += "<p>"+str((comment.get("creation_date")).strftime("%d-%b,%y"))+":-"+comment.get("content")+"</p>"	
 		department_list = frappe.db.sql("""
 			select department_name from `tabKM Issue Department` 
 			where parent=%s""",
@@ -64,13 +63,16 @@ def get_data(filters):
 		if category_list:
 			for category in category_list:
 				case_category += category.get("category")+"<br>"
+		mandal_village = str(issue.get("km_mandal_case"))+"<br>"+str(issue.get("km_village_case"))
+		caller_name_mobile_no = str(issue.km_caller_name)+"<br>"+str(issue.raised_by_phone)
+		creation = (issue.creation_date).strftime("%d-%m-%Y %I:%M %p")
 		row = [
 			issue.name, department,
-			issue.km_mandal_case, issue.km_village_case,
-			issue.km_caller_name, issue.raised_by_phone,
-			issue.km_caste, issue.creation_date,
+			mandal_village,
+			caller_name_mobile_no,
+			issue.km_caste, creation,
 			case_category, issue.description,
-			update
+			update,note
 		]
 		data.append(row)
 	return data
@@ -83,5 +85,7 @@ def get_conditions(filters):
 	if filters.get("to_date"): 
 		conditions += "and creation <= " + "'" + filters.get("to_date") + "'"
 	if filters.get("status"): 
-		conditions += "and status = " + "'" + filters.get("status") + "'"		
+		conditions += "and status = " + "'" + filters.get("status") + "'"	
+	if filters.get("district"):
+		conditions += "and km_district_case =" + "'" + filters.get("district") + "'"
 	return conditions
