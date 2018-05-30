@@ -5,6 +5,7 @@ import csv
 import re
 from datetime import datetime
 from frappe.utils.pdf import get_pdf
+from frappe.utils.print_format import report_to_pdf
 from frappe.model.naming import make_autoname
 from frappe.core.page.background_jobs.background_jobs import get_info
 
@@ -582,86 +583,3 @@ def update_communication():
 	except Exception as e:
 		frappe.db.rollback()
 		frappe.log_error(message=frappe.get_traceback(), title="Error in updating communication")
-					
-def get_conditions():
-	conditions = ""
-	
-	# if filters.get("from_date"): 
-		# conditions += "and creation >=" + "'" + filters.get("from_date") + "'"
-	# conditions += "and creation >= 28-04-2018"
-	conditions += "and creation >='2018-04-18 13:35:52.394138'"
-	# if filters.get("to_date"): 
-		# conditions += "and creation <= " + "'" + filters.get("to_date") + "'"
-	# conditions += "and creation <= 28-05-2018"
-	conditions += "and creation <='2018-05-18 13:35:52.394138' "
-	# if filters.get("status"): 
-		# conditions += "and status = " + "'" + filters.get("status") + "'"		
-	conditions += "and status = 'Resolved'" 
-	return conditions
-
-@frappe.whitelist()
-def get_km_data():
-	for x in xrange(1,10):
-		print "in km data method in api"
-	conditions = get_conditions()
-	issues = frappe.db.sql("""
-		select name, km_department, km_mandal_case, 
-		km_village_case, km_caller_name, 
-		raised_by_phone, km_caste, 
-		date(creation) as creation_date, km_case_category, 
-		description from `tabIssue` where docstatus = 0 %s """% conditions, as_dict=1)
-	collector_review_report = [] 
-	# for x in xrange(1,10):
-	# 	print "issues",issues
-	for issue in issues:
-		# print "In issue for loop"	
-		update = ""
-		department = ""
-		case_category = ""
-		note = ""
-		comments = frappe.db.sql("""
-			select content, date(creation) as creation_date from `tabCommunication` 
-			where comment_type='Comment' and reference_name=%s order by creation """,
-			issue.get("name"), as_dict=1)
-		if comments:
-			for comment in comments:
-				update += "<p>"+str(comment.get("creation_date"))+":"+comment.get("content")+"</p>"	
-		department_list = frappe.db.sql("""
-			select department_name from `tabKM Issue Department` 
-			where parent=%s""",
-			issue.get("name"), as_dict=1)
-		if department_list:
-			for dept in department_list:
-				department += dept.get("department_name")+"<br>"
-
-		category_list = frappe.db.sql("""
-			select category from `tabKM Issue Category Item` 
-			where parent=%s""",
-			issue.get("name"), as_dict=1)
-		if category_list:
-			for category in category_list:
-				case_category += category.get("category")+"<br>"
-		row = [
-			issue.name, department,
-			issue.km_mandal_case, issue.km_village_case,
-			issue.km_caller_name, issue.raised_by_phone,
-			issue.km_caste, issue.creation_date,
-			case_category, issue.description,
-			update, note
-		]
-		collector_review_report.append(row)
-	frappe.local.response.filename = "collector_review_report.pdf"
-	for x in xrange(1,10):
-		print "filename"
-	final_html = frappe.render_template("public/html/collector_review_report.html",collector_review_report)
-	for x in xrange(1,10):
-		print "final_html",final_html
-	frappe.response.filecontent = get_pdf(final_html)
-	frappe.response.type = "download"
-	# return data
-
-
-@frappe.whitelist()
-def test():
-	for x in xrange(1,10):
-		print "in api.py file"
