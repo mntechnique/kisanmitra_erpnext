@@ -16,7 +16,7 @@ app_license = "MIT"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/kisanmitra_erpnext/css/kisanmitra_erpnext.css"
-app_include_js = "/assets/kisanmitra_erpnext/js/kisanmitra_erpnext.min.js"
+# app_include_js = "/assets/kisanmitra_erpnext/js/kisanmitra_erpnext.min.js"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/kisanmitra_erpnext/css/kisanmitra_erpnext.css"
@@ -28,7 +28,6 @@ app_include_js = "/assets/kisanmitra_erpnext/js/kisanmitra_erpnext.min.js"
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
-doctype_list_js = {"Issue": "public/js/issue_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 
