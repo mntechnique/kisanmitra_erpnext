@@ -4,12 +4,7 @@ import csv
 import re
 
 def execute():
-	frappe.reload_doc("support", "doctype", "issue")
-
-	# issues = frappe.get_all("Issue", fields=["name", "km_caller_name"], filters = {"contact":"","lead":""})
-
 	issues = []
-	rest = []
 	file_path = os.path.join(frappe.get_site_path(), "public","files", "issue_contact.csv")
 	with open(file_path) as kmdata:
 		reader = csv.DictReader(kmdata)
@@ -36,6 +31,4 @@ def execute():
 				frappe.db.sql("""update `tabIssue`
 						set lead=%s, contact=%s,
 						raised_by_phone=%s where name=%s""",(lead,contact,raised_by_phone,name))
-		else :
-			rest.append(name)
-	print "rest list\n",rest		
+	
