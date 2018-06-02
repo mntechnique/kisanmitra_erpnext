@@ -16,7 +16,6 @@ frappe.query_reports["Kisanmitra Report"] = {
 			"label": __("From Date"),
 			"fieldtype": "Date",
 			"default": frappe.datetime.add_months(frappe.datetime.get_today(), -1),
-			"width": "80"
 		},
 		{
 			"fieldname":"to_date",
@@ -78,6 +77,18 @@ frappe.query_reports["Kisanmitra Report"] = {
 					}
 				}
 			}
+		},
+		{
+			"fieldname":"department",
+			"label": __("Department"),
+			"fieldtype": "Link",
+			"options":"Department"
+		},
+		{
+			"fieldname":"case_category",
+			"label": __("Case Category"),
+			"fieldtype": "Link",
+			"options":"KM Issue Category"
 		}
 
 	]

@@ -31,11 +31,11 @@ def get_columns():
 def get_data(filters):
 	conditions = get_conditions(filters)
 	issues = frappe.db.sql("""
-		select name, status, km_mandal_case, 
-		km_village_case, km_caller_name, 
-		raised_by_phone, km_caste, 
-		creation as creation_date, km_case_category, 
-		description from `tabIssue` where docstatus = 0 %s """% conditions, as_dict=1)
+		select iss.name, iss.status, iss.km_mandal_case, 
+		iss.km_village_case, iss.km_caller_name, 
+		iss.raised_by_phone, iss.km_caste, 
+		iss.creation as creation_date, iss.km_case_category, 
+		iss.description from `tabIssue` iss %s where iss.docstatus = 0 %s """% (conditions[0], conditions[1]), as_dict=1)
 	data = [] 
 	for issue in issues:
 		update = ""
@@ -85,13 +85,27 @@ def get_data(filters):
 
 def get_conditions(filters):
 	conditions = ""
+	department_and_case_category = ""
 	
 	if filters.get("from_date"): 
-		conditions += "and creation >=" + "'" + filters.get("from_date") + "'"
+		conditions += "and iss.creation >=" + "'" + filters.get("from_date") + "'"
 	if filters.get("to_date"): 
-		conditions += "and creation <= " + "'" + filters.get("to_date") + "'"
+		conditions += "and iss.creation <= " + "'" + filters.get("to_date") + "'"
 	if filters.get("status"): 
-		conditions += "and status = " + "'" + filters.get("status") + "'"	
+		conditions += "and iss.status = " + "'" + filters.get("status") + "'"
+	if filters.get("state"): 
+		conditions += "and iss.km_state_case = " + "'" + filters.get("state") + "'"		
 	if filters.get("district"):
-		conditions += "and km_district_case =" + "'" + filters.get("district") + "'"
-	return conditions
+		conditions += "and iss.km_district_case =" + "'" + filters.get("district") + "'"
+	if filters.get("mandal"):
+		conditions += "and iss.km_mandal_case =" + "'" + filters.get("mandal") + "'"
+	if filters.get("village"):
+		conditions += "and iss.km_village_case =" + "'" + filters.get("village") + "'"		
+	if filters.get("department"):
+		department_and_case_category += ",`tabKM Issue Department` d"
+		conditions += "and iss.name=d.parent and d.department_name = " + "'" + filters.get("department") + "' "
+	if filters.get("case_category"):
+		department_and_case_category += ",`tabKM Issue Category Item` c"
+		conditions += "and iss.name=c.parent and c.category = " + "'" + filters.get("case_category") + "' "
+
+	return department_and_case_category, conditions
