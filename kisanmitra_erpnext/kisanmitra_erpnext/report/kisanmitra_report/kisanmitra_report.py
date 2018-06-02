@@ -16,7 +16,6 @@ def get_columns():
 		_("Case No") + ":Link/Issue:100",
 		_("Status") + ":Data:100",
 		_("Department") + ":HTML:100",
-		# _("Case Catogery") + ":HTML:100",
 		_("Mandal/Village") + ":HTML:100",
 		_("Caller Name/Mobile No.") + ":HTML:100",
 		_("Caste Catogery") + ":Data:100",
