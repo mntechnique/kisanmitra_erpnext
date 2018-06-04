@@ -577,9 +577,7 @@ def update_communication():
 						km_calls_start_time=%s, km_calls_end_time=%s where name=%s""",
 						(ed.get("Status"),ed.get("Duration"),ed.get("StartTime"),
 						ed.get("EndTime"),call.get("name")))
-		frappe.db.commit()
+					frappe.db.commit()
 	except Exception as e:
-		frappe.db.rollback()
+		# frappe.db.rollback()
 		frappe.log_error(message=frappe.get_traceback(), title="Error in updating communication")
-					
-
