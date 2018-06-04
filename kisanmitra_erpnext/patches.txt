@@ -1,5 +1,5 @@
 #kisanmitra_erpnext.patches.update_departments_in_issue
 #kisanmitra_erpnext.patches.update_case_categories_in_issue
-#kisanmitra_erpnext.patches.update_lead_contact_field
+kisanmitra_erpnext.patches.update_lead_contact_field
 #kisanmitra_erpnext.patches.status_open
-kisanmitra_erpnext.patches.non_zero_contact_number
+#kisanmitra_erpnext.patches.non_zero_contact_number
