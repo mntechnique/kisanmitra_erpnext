@@ -86,6 +86,11 @@ app_license = "MIT"
 # 		"on_trash": "method"
 #	}
 # }
+# doc_events = {
+# 	"Issue": {
+# 		"after_insert":"kisanmitra.api.update_caller_name"
+# 	}
+# }
 
 # Scheduled Tasks
 # ---------------
