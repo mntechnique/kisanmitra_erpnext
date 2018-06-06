@@ -582,6 +582,7 @@ def update_communication():
 		frappe.db.rollback()
 		frappe.log_error(message=frappe.get_traceback(), title="Error in updating communication")
 
+#code to update caller name field
 @frappe.whilelist()
 def update_caller_name(doc, method):
 	callers_name = None
