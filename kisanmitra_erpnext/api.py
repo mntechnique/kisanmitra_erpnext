@@ -579,5 +579,26 @@ def update_communication():
 						ed.get("EndTime"),call.get("name")))
 					frappe.db.commit()
 	except Exception as e:
-		# frappe.db.rollback()
+		frappe.db.rollback()
+		frappe.log_error(message=frappe.get_traceback(), title="Error in updating communication")
+
+#code to update caller name field
+@frappe.whilelist()
+def update_caller_name(doc, method):
+	callers_name = None
+	if doc.get("contact"):
+		callers_name = frappe.db.sql("""select trim(concat(first_name," ",last_name)) as caller_name
+			from `tabContact` where name=%s""",(doc.get("contact")))
+		frappe.db.set_value(doc.doctype,doc.name,"km_caller_name",callers_name.get(caller_name))
+	
+	elif doc.get("raised_by_phone"):
+		callers_name = frappe.db.sql("""select trim(concat(first_name," ",last_name)) as caller_name
+			from `tabContact` where mobile_no=%s""",(doc.get("raised_by_phone")))
+		frappe.db.set_value(doc.doctype,doc.name,"km_caller_name",callers_name.get(caller_name))
+
+	elif doc.get("lead"):
+		callers_name = frappe.db.sql("""select trim(lead_name)
+			from `tabLead` where name=%s""",(doc.get("lead")))
+		frappe.db.set_value(doc.doctype,doc.name,"km_caller_name",callers_name.get(caller_name))
+		frappe.db.rollback()
 		frappe.log_error(message=frappe.get_traceback(), title="Error in updating communication")
