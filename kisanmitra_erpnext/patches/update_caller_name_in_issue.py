@@ -2,32 +2,33 @@ import frappe
 #patch to update caller name field
 def execute():
 	frappe.reload_doc("support","doctype","issue")
+	name = None
+	caller_name = None
 
 	issues = frappe.get_all("Issue",filters={"km_caller_name":""},fields=["*"])
-	print "in update caller name patch"
-	count = 1
 	try:
 		for issue in issues:
 			if issue.get("contact"):
-				frappe.db.sql("""update `tabIssue` 
-					set km_caller_name=(select trim(concat(first_name," ",last_name))
-					from `tabContact` where name=%s) where name=%s""",(issue.get("contact"),issue.get("name")))
-				print "updated by contact field ",count
-				count += 1
+				name = frappe.db.get_value("Contact",issue.get("contact"),["first_name","last_name"])
+				if name:
+					caller_name = " ".join([name[0] or "",name[1] or ""]).strip()
+					frappe.db.sql("""update `tabIssue` 
+						set km_caller_name=%s where name=%s""",(caller_name,issue.get("name")))
 			
 			elif issue.get("raised_by_phone"):
-				frappe.db.sql("""update `tabIssue` 
-					set km_caller_name=(select trim(concat(first_name," ",last_name))
-					from `tabContact` where mobile_no=%s) where name=%s""",(issue.get("raised_by_phone"),issue.get("name")))
-				print "updated by raised_by_phone field ",count
-				count += 1
+				name = frappe.db.get_value("Contact",{"mobile_no":issue.get("raised_by_phone")},["first_name","last_name"])
+				if name:
+					caller_name =" ".join([name[0] or "",name[1] or ""]).strip()
+					frappe.db.sql("""update `tabIssue` 
+						set km_caller_name=%s where name=%s""",(caller_name,issue.get("name")))
 			
 			elif issue.get("lead"):
-				frappe.db.sql("""update `tabIssue` 
-					set km_caller_name=(select trim(lead_name)
-					from `tabLead` where name=%s) where name=%s""",(issue.get("lead"),issue.get("name")))
-				print "updated by lead field ",count
-				count += 1
+				name = frappe.db.get_value("Lead",issue.get("lead"),["first_name","last_name"])
+				if name:
+					caller_name =" ".join([name[0] or "",name[1] or ""]).strip()
+					frappe.db.sql("""update `tabIssue`
+						set km_caller_name=%s where name=%s""",(caller_name,issue.get("name")))
+
 	except Exception as e:
 		frappe.db.rollback()
 		frappe.log_error(message=frappe.get_traceback(), title="error in update caller name")			
