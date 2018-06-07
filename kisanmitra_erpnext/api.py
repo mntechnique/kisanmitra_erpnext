@@ -579,7 +579,7 @@ def update_communication():
 						ed.get("EndTime"),call.get("name")))
 					frappe.db.commit()
 	except Exception as e:
-		frappe.db.rollback()
+		# frappe.db.rollback()
 		frappe.log_error(message=frappe.get_traceback(), title="Error in updating communication")
 
 #code to update caller name field
