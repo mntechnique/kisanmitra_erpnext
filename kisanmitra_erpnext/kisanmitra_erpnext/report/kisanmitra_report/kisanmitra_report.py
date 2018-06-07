@@ -70,7 +70,7 @@ def get_data(filters):
 		village = issue.get("km_village_case") if issue.get("km_village_case") else "-"
 		mandal_village = str(mandal)+"<br>"+str(village)
 		caller_name_mobile_no = str(issue.km_caller_name)+"<br>"+str(issue.raised_by_phone)
-		creation = (issue.creation_date).strftime("%d-%m-%Y %I:%M %p")
+		creation = (issue.creation_date).strftime("%d-%b,%Y %I:%M %p")
 		row = [
 			issue.name, issue.status, department,
 			mandal_village,
