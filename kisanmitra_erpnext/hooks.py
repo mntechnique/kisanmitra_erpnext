@@ -88,7 +88,7 @@ app_license = "MIT"
 # }
 doc_events = {
 	"Issue": {
-		"after_insert":"kisanmitra.api.update_caller_name"
+		"after_insert":"kisanmitra_erpnext.api.update_caller_name"
 	}
 }
 
