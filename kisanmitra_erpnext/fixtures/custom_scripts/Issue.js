@@ -32,5 +32,27 @@ frappe.ui.form.on("Issue", {
 				}
 			}
 		});
+
+		frm.add_custom_button(__("Send SMS"), function() {
+			var dialog = new frappe.ui.Dialog({
+				title: 'Send SMS',
+				fields: [
+					{'fieldname': "message_template", 'fieldtype': 'Link', 'options': "KM SMS Template", 'label':'Template'},
+					{'fieldname': "message_text", 'fieldtype': 'Text', 'options': "", 'label':'Message'},
+					{'fieldname': "recipients", 'fieldtype': 'Data', 'options': "", 'label':'Recipients'}
+				],
+			});
+			dialog.set_value("recipients", cur_frm.doc.km_caller_name);
+			dialog.set_primary_action(__("Send"), () => {
+				var values = dialog.get_values();
+				frm.call("frappe.core.doctype.sms_settings.sms_settings.send_sms", {
+					receiver_list: values.get("recipients"),
+					msg: values.get("message_text")
+				}, () => {
+					dialog.hide();
+				});
+			});
+			dialog.show();
+    	});
 	}
 });
