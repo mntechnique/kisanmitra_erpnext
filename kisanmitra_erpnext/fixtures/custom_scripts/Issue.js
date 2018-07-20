@@ -42,7 +42,15 @@ frappe.ui.form.on("Issue", {
 					{'fieldname': "recipients", 'fieldtype': 'Data', 'options': "", 'label':'Recipients'}
 				],
 			});
-			dialog.set_value("recipients", cur_frm.doc.km_caller_name);
+			dialog.set_value("recipients", cur_frm.doc.raised_by_phone);
+			
+			dialog.get_input("message_template").on("blur", function(e) {
+				console.log("blur", );
+				frappe.model.with_doc("KM SMS Template", dialog.get_value("message_template"), () => {
+
+				});
+			});
+			
 			dialog.set_primary_action(__("Send"), () => {
 				var values = dialog.get_values();
 				frm.call("frappe.core.doctype.sms_settings.sms_settings.send_sms", {
